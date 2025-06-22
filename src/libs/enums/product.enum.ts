@@ -1,8 +1,40 @@
+export enum ProductStatus {
+  PAUSE = "PAUSE",
+  PROCESS = "PROCESS",
+  DELETE = "DELETE",
+}
+
+export enum ProductCategory {
+  BURGERS = "BURGERS",
+  CHICKEN = "CHICKEN",
+  PIZZA = "PIZZA",
+  MEXICAN = "MEXICAN",
+  SIDES = "SIDES",
+  BREAKFAST = "BREAKFAST",
+  SALADS = "SALADS",
+  DESSERTS = "DESSERTS",
+  BEVERAGES = "BEVERAGES",
+  SANDWICHES = "SANDWICHES",
+  APPETIZERS = "APPETIZERS",
+}
+
+export enum ProductTime {
+  BREAKFAST = "BREAKFAST",
+  LUNCH = "LUNCH",
+  DINNER = "DINNER",
+  ALL_DAY = "ALL_DAY",
+}
+
+export enum ProductSpice {
+  NONE = "NONE",
+  MEDIUM = "MEDIUM",
+  HOT = "HOT",
+}
+
 export enum ProductSize {
   SMALL = "SMALL",
-  NORMAL = "NORMAL",
+  REGULAR = "REGULAR",
   LARGE = "LARGE",
-  SET = "SET",
 }
 
 export enum ProductVolume {
@@ -13,16 +45,11 @@ export enum ProductVolume {
   TWO = 2,
 }
 
-export enum ProductStatus {
-  PAUSE = "PAUSE",
-  PROCESS = "PROCESS",
-  DELETE = "DELETE",
-}
-
-export enum ProductCollection {
-  DISH = "DISH",
-  SALAD = "SALAD",
-  DESSERT = "DESSERT",
-  DRINK = "DRINK",
-  OTHER = "OTHER",
+// Additional utility enums
+export enum SortOptions {
+  POPULAR = "POPULAR",
+  PRICE_LOW_HIGH = "PRICE_LOW_HIGH",
+  PRICE_HIGH_LOW = "PRICE_HIGH_LOW",
+  ALPHABETICAL = "ALPHABETICAL",
+  NEWEST = "NEWEST",
 }
