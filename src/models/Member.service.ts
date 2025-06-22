@@ -88,9 +88,7 @@ class MemberService {
     const result = await this.memberModel
       .findOneAndUpdate({ _id: memberId }, input, { new: true })
       .exec();
-    console.log("member: ", member);
-    console.log("input: ", input);
-    console.log("result: ", result);
+
     if (!result)
       throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATED_FAILED);
 

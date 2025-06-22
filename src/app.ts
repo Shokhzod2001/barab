@@ -1,21 +1,12 @@
 import cors from "cors";
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import path from "path";
 import router from "./router";
 import routerAdmin from "./router-admin";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import { MORGAN_FORMAT } from "./libs/config";
-
-import session from "express-session";
-import ConnectMongoDB from "connect-mongodb-session";
-import { T } from "./libs/types/common";
-
-const MongoDBStore = ConnectMongoDB(session);
-const store = new MongoDBStore({
-  uri: String(process.env.MONGO_URL),
-  collection: "sessions",
-});
+import AuthService from "./models/Auth.service";
 
 /** 1 - ENTRANCE **/
 const app = express();
@@ -27,26 +18,31 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan(MORGAN_FORMAT));
 
-/** 2 - SESSIONS **/
-// 1) session added to the req => req.session (creating session)
-// 2) F.cookie.sid => req.session.+member (reading sesions)
-app.use(
-  session({
-    secret: String(process.env.SESSION_SECRET),
-    cookie: {
-      maxAge: 1000 * 3600 * 6, // 6 hrs
-    },
-    store: store,
-    resave: true,
-    saveUninitialized: true,
-  })
-);
+/** 2 - TOKENS IN COOKIES **/
+const authService = new AuthService();
 
-app.use(function (req, res, next) {
-  const sessionInstance = req.session as T;
-  res.locals.member = sessionInstance.member;
+const setMemberLocals = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const token = req.cookies["accessToken"];
+  let member = null;
+
+  if (token) {
+    try {
+      member = await authService.checkAuth(token);
+    } catch (err) {
+      console.log("Invalid or expired token:", err);
+      res.clearCookie("accessToken");
+    }
+  }
+
+  res.locals.member = member;
   next();
-});
+};
+
+app.use("/admin", setMemberLocals);
 
 /** 3 - VIEWS **/
 app.set("views", path.join(__dirname, "views"));

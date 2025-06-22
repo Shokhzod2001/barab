@@ -1,11 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import { T } from "../libs/types/common";
 import MemberService from "../models/Member.service";
-import { AdminRequest, LoginInput, MemberInput } from "../libs/types/member";
+import { ExtendedRequest, LoginInput, MemberInput } from "../libs/types/member";
 import { MemberType } from "../libs/enums/member.enum";
 import Errors, { HttpCode, Message } from "../libs/Errors";
+import AuthService from "../models/Auth.service";
+import { AUTH_TIMER } from "../libs/config";
 
 const memberService = new MemberService();
+const authService = new AuthService();
+
 const restaurantController: T = {};
 restaurantController.goHome = (req: Request, res: Response) => {
   try {
@@ -38,7 +42,7 @@ restaurantController.getLogin = (req: Request, res: Response) => {
 };
 
 restaurantController.processSignup = async (
-  req: AdminRequest,
+  req: ExtendedRequest,
   res: Response
 ) => {
   try {
@@ -54,11 +58,14 @@ restaurantController.processSignup = async (
     newMember.memberType = MemberType.RESTAURANT;
 
     const result = await memberService.processSignup(newMember);
+    const plainResult = result.toObject ? result.toObject() : { ...result };
+    const token = await authService.createToken(plainResult);
 
-    req.session.member = result;
-    req.session.save(function () {
-      res.redirect("/admin/product/all");
+    res.cookie("accessToken", token, {
+      maxAge: AUTH_TIMER * 3600 * 1000,
+      httpOnly: false,
     });
+    res.redirect("/admin/product/all");
   } catch (err) {
     console.log("Error, processSignup", err);
     const message =
@@ -70,19 +77,22 @@ restaurantController.processSignup = async (
 };
 
 restaurantController.processLogin = async (
-  req: AdminRequest,
+  req: ExtendedRequest,
   res: Response
 ) => {
   try {
     console.log("processLogin");
 
     const input: LoginInput = req.body,
-      result = await memberService.processLogin(input);
+      result = await memberService.processLogin(input),
+      plainResult = result.toObject ? result.toObject() : { ...result },
+      token = await authService.createToken(plainResult);
 
-    req.session.member = result;
-    req.session.save(function () {
-      res.redirect("/admin/product/all");
+    res.cookie("accessToken", token, {
+      maxAge: AUTH_TIMER * 3600 * 1000,
+      httpOnly: false,
     });
+    res.redirect("/admin/product/all");
   } catch (err) {
     console.log("Error, processLogin", err);
     const message =
@@ -93,12 +103,11 @@ restaurantController.processLogin = async (
   }
 };
 
-restaurantController.logout = async (req: AdminRequest, res: Response) => {
+restaurantController.logout = async (req: ExtendedRequest, res: Response) => {
   try {
     console.log("logout");
-    req.session.destroy(function () {
-      res.redirect("/admin");
-    });
+    res.cookie("accessToken", null, { maxAge: 0, httpOnly: true });
+    res.redirect("/admin");
   } catch (err) {
     console.log("Error, logout", err);
     res.redirect("/admin");
@@ -141,30 +150,45 @@ restaurantController.updateChosenUSer = async (req: Request, res: Response) => {
   }
 };
 
-restaurantController.checkAuthSession = async (
-  req: AdminRequest,
+restaurantController.checkAuthVerification = async (
+  req: ExtendedRequest,
   res: Response
 ) => {
   try {
-    console.log("checkAuthSession");
-    if (req.session?.member)
-      res.send(`<script> alert("${req.session.member.memberNick}") </script>`);
-    else res.send(`<script> alert("${Message.NOT_AUTHENTICATED}") </script>`);
+    console.log("checkAuthVerification");
+    const token = req.cookies["accessToken"];
+    if (token) req.member = await authService.checkAuth(token);
+
+    if (req.member) {
+      res.send(`<script> alert("${req.member.memberNick}") </script>`);
+    } else {
+      res.send(`<script> alert("${Message.NOT_AUTHENTICATED}") </script>`);
+    }
   } catch (err) {
-    console.log("Error, checkAuthSession", err);
-    res.send(err);
+    console.log("Error, checkAuthVerification", err);
+    res.send(`<script> alert("${Message.NOT_AUTHENTICATED}") </script>`);
   }
 };
 
-restaurantController.verifyRestaurant = (
-  req: AdminRequest,
+restaurantController.verifyRestaurant = async (
+  req: ExtendedRequest,
   res: Response,
   next: NextFunction
 ) => {
-  if (req.session?.member?.memberType === MemberType.RESTAURANT) {
-    req.member = req.session.member;
+  try {
+    const token = req.cookies["accessToken"];
+    if (token) req.member = await authService.checkAuth(token);
+
+    if (!req.member || req.member.memberType !== MemberType.RESTAURANT) {
+      const message = Message.NOT_AUTHENTICATED;
+      return res.send(
+        `<script> alert("${message}"); window.location.replace('/admin/login'); </script>`
+      );
+    }
+
     next();
-  } else {
+  } catch (err) {
+    console.log("Error, verifyRestaurant", err);
     const message = Message.NOT_AUTHENTICATED;
     res.send(
       `<script> alert("${message}"); window.location.replace('/admin/login'); </script>`

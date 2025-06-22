@@ -4,7 +4,7 @@ import Errors, { HttpCode, Message } from "../libs/Errors";
 import { T } from "../libs/types/common";
 import ProductService from "../models/Product.service";
 import { ProductInput, ProductInquiry } from "../libs/types/product";
-import { AdminRequest, ExtendedRequest } from "../libs/types/member";
+import { ExtendedRequest } from "../libs/types/member";
 import { ProductCategory } from "../libs/enums/product.enum";
 
 const productService = new ProductService();
@@ -23,7 +23,7 @@ productController.getProducts = async (req: Request, res: Response) => {
     };
 
     if (productCollection) {
-      inquiry.productCollection = productCollection as ProductCategory;
+      inquiry.productCategory = productCollection as ProductCategory;
     }
     if (search) inquiry.search = String(search);
 
@@ -68,7 +68,7 @@ productController.getAllProducts = async (req: Request, res: Response) => {
 };
 
 productController.createNewProduct = async (
-  req: AdminRequest,
+  req: ExtendedRequest,
   res: Response
 ) => {
   try {

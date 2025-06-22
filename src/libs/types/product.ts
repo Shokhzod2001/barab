@@ -1,22 +1,42 @@
 import { ObjectId } from "mongoose";
 import {
-  ProductCollection,
+  ProductCategory,
   ProductSize,
+  ProductSpice,
   ProductStatus,
+  ProductTime,
+  ProductVolume,
 } from "../enums/product.enum";
+
+interface Combo {
+  comboName?: string;
+  comboPrice?: number;
+  comboItems?: string[]; // Array of menu item IDs
+  comboDrink?: string;
+  comboSide?: string;
+}
 
 export interface Product {
   _id: ObjectId;
   productStatus: ProductStatus;
-  productCollection: ProductCollection;
+  productCategory: ProductCategory;
   productName: string;
   productPrice: number;
   productLeftCount: number;
   productSize: ProductSize;
-  productVolume: number;
+  productVolume: ProductVolume;
+  productTime: ProductTime[];
+  productSpice: ProductSpice;
+  calories?: number;
   productDesc?: string;
   productImages: string[];
+  preparationTime: number;
+  isPopular: boolean;
+  isNewItem: boolean;
   productViews: number;
+  productOrders: number;
+  tags: string[];
+  combos?: Combo[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,33 +45,49 @@ export interface ProductInquiry {
   order: string;
   page: number;
   limit: number;
-  productCollection?: ProductCollection;
+  productCategory?: ProductCategory;
   search?: string;
 }
 
 export interface ProductInput {
   productStatus?: ProductStatus;
-  productCollection: ProductCollection;
+  productCategory: ProductCategory;
   productName: string;
   productPrice: number;
-  productLeftCount: number;
+  productLeftCount?: number;
   productSize?: ProductSize;
-  productVolume?: number;
+  productVolume?: ProductVolume;
+  productTime?: ProductTime[];
+  productSpice?: ProductSpice;
+  calories?: number;
   productDesc?: string;
   productImages?: string[];
+  preparationTime?: number;
+  isPopular?: boolean;
+  isNewItem?: boolean;
+  tags?: string[];
+  combos?: Combo[];
   productViews?: number;
 }
 
 export interface ProductUpdateInput {
   _id: ObjectId;
   productStatus?: ProductStatus;
-  productCollection?: ProductCollection;
+  productCategory?: ProductCategory;
   productName?: string;
   productPrice?: number;
   productLeftCount?: number;
   productSize?: ProductSize;
-  productVolume?: number;
+  productVolume?: ProductVolume;
+  productTime?: ProductTime[];
+  productSpice?: ProductSpice;
+  calories?: number;
   productDesc?: string;
   productImages?: string[];
+  preparationTime?: number;
+  isPopular?: boolean;
+  isNewItem?: boolean;
+  tags?: string[];
+  combos?: Combo[];
   productViews?: number;
 }
