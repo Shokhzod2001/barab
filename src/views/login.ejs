@@ -3,46 +3,141 @@
 <link rel="stylesheet" type="text/css" href="/css/login.css" />
 
 <body>
-  <form
-    onsubmit="return validateSignupForm()"
-    class="login-container"
-    action="/admin/login"
-    METHOD="POST"
-  >
-    <div class="login-frame">
-      <div class="login-top">
-        <span>Enter</span>
-        <div>Go back <a href="/admin" style="color: #6440fb">Home</a></div>
-        <p>
-          Not registered yet?
-          <a href="/admin/signup" style="color: #6440fb">Signup</a>
-        </p>
-      </div>
-      <div class="login-input-frame">
-        <div class="login-input-container">
-          <label>Restaurant *</label>
-          <input
-            type="text"
-            name="memberNick"
-            class="member-nick"
-            placeholder="Username"
-            value=""
-          />
+  <!-- Geometric Background -->
+  <div class="geometric-bg">
+    <div
+      class="shape circle"
+      style="
+        width: 60px;
+        height: 60px;
+        top: 10%;
+        left: 15%;
+        animation-delay: 0s;
+      "
+    ></div>
+    <div
+      class="shape square"
+      style="
+        width: 40px;
+        height: 40px;
+        top: 70%;
+        right: 20%;
+        animation-delay: -5s;
+      "
+    ></div>
+    <div
+      class="shape triangle"
+      style="top: 30%; left: 80%; animation-delay: -10s"
+    ></div>
+    <div
+      class="shape circle"
+      style="
+        width: 80px;
+        height: 80px;
+        bottom: 20%;
+        left: 10%;
+        animation-delay: -15s;
+      "
+    ></div>
+    <div
+      class="shape square"
+      style="
+        width: 50px;
+        height: 50px;
+        top: 50%;
+        right: 10%;
+        animation-delay: -20s;
+      "
+    ></div>
+  </div>
+
+  <div class="main-container">
+    <div class="auth-card">
+      <!-- Left Section with Brand -->
+      <div class="left-section">
+        <div class="brand-showcase">
+          <div class="logo-container">
+            <div class="logo-text">FB</div>
+          </div>
+
+          <div class="brand-metrics">
+            <div class="metric">
+              <div class="metric-number">500+</div>
+              <div class="metric-label">Restaurants</div>
+            </div>
+            <div class="metric">
+              <div class="metric-number">50K+</div>
+              <div class="metric-label">Orders/Day</div>
+            </div>
+            <div class="metric">
+              <div class="metric-number">99.9%</div>
+              <div class="metric-label">Uptime</div>
+            </div>
+          </div>
         </div>
-        <div class="login-input-container">
-          <label>Password *</label>
-          <input
-            type="password"
-            name="memberPassword"
-            class="member-password"
-            placeholder="Password"
-            value=""
-          />
+
+        <div class="welcome-text">
+          <h1 class="welcome-title">FastBite Admin</h1>
+          <p class="welcome-subtitle">
+            Advanced restaurant management platform for modern businesses.
+            Streamline operations and boost efficiency.
+          </p>
         </div>
       </div>
-      <button class="login-btn btn" name="login" type="submit">Login</button>
+
+      <!-- Right Section with Forms -->
+      <div class="right-section">
+        <!-- Login Form -->
+        <div class="form-container active" id="loginForm">
+          <div class="form-title">Welcome Back</div>
+
+          <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+              <label>Name</label>
+              <input
+                type="text"
+                class="form-input"
+                placeholder="Enter your name"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Password</label>
+              <input
+                type="password"
+                class="form-input"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+
+            <button type="submit" class="submit-btn">Access Dashboard</button>
+
+            <a href="/admin" class="back-link">
+              <button
+                type="button"
+                class="submit-btn back-btn"
+                onclick="showSelector()"
+              >
+                ← Back
+              </button></a
+            >
+          </form>
+
+          <div class="social-section">
+            <div class="social-divider">
+              <span>or continue with</span>
+            </div>
+            <div class="social-buttons">
+              <button class="social-btn"><span>G</span> Google</button>
+              <button class="social-btn"><span>K</span> KakaoTalk</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </form>
+  </div>
 
   <script type="text/javascript" src="/js/login.js"></script>
 </body>

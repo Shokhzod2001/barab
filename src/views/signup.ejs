@@ -3,111 +3,234 @@
 <link rel="stylesheet" type="text/css" href="/css/signup.css" />
 
 <body>
-  <div class="signup-container">
-    <form
-      onsubmit="return validateSignupForm()"
-      action="/admin/signup"
-      method="POST"
-      enctype="multipart/form-data"
-    >
-      <div class="signup-frame" style="width: 650px">
-        <div class="signup-top">
-          <span>Signup</span>
-          <div>Go back <a href="/admin" style="color: #6440fb">Home</a></div>
-          <p>
-            Already signed up?
-            <a href="/admin/login" style="color: #6440fb">Login</a>
-          </p>
-        </div>
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>FastBite - Create Account</title>
+      <link rel="stylesheet" href="signup.css" />
+    </head>
+    <body>
+      <!-- Geometric Background -->
+      <div class="geometric-bg">
+        <div
+          class="shape circle"
+          style="
+            width: 60px;
+            height: 60px;
+            top: 10%;
+            left: 15%;
+            animation-delay: 0s;
+          "
+        ></div>
+        <div
+          class="shape square"
+          style="
+            width: 40px;
+            height: 40px;
+            top: 70%;
+            right: 20%;
+            animation-delay: -5s;
+          "
+        ></div>
+        <div
+          class="shape triangle"
+          style="top: 30%; left: 80%; animation-delay: -10s"
+        ></div>
+        <div
+          class="shape circle"
+          style="
+            width: 80px;
+            height: 80px;
+            bottom: 20%;
+            left: 10%;
+            animation-delay: -15s;
+          "
+        ></div>
+        <div
+          class="shape square"
+          style="
+            width: 50px;
+            height: 50px;
+            top: 50%;
+            right: 10%;
+            animation-delay: -20s;
+          "
+        ></div>
+      </div>
 
-        <div class="sign-input-frame" style="justify-content: space-between">
-          <div class="sign-up-frame">
-            <label>Restaurant *</label>
-            <input
-              type="text"
-              name="memberNick"
-              class="member-nick"
-              placeholder="Username"
-              value=""
-            />
-          </div>
-          <div class="sign-up-frame">
-            <label>Phone *</label>
-            <input
-              type="text"
-              name="memberPhone"
-              class="member-phone"
-              placeholder="Phone"
-              value=""
-            />
-          </div>
-        </div>
-        <div class="sign-input-frame" style="justify-content: space-between">
-          <div class="sign-up-frame">
-            <label>Password *</label>
-            <input
-              type="password"
-              name="memberPassword"
-              class="member-password"
-              placeholder="Password"
-              value=""
-            />
-          </div>
-          <div class="sign-up-frame">
-            <label>Repeat password *</label>
-            <input
-              type="password"
-              name="confirmPassword"
-              class="confirm-password"
-              placeholder="Repeat password"
-              value=""
-            />
-          </div>
-        </div>
-
-        <div class="signup-input-frame">
-          <div class="media-frame">
-            <img class="upload-img-frame" src="/img/default.jpeg" />
-            <div class="upload-container">
-              <span class="media-text">Product image</span>
-              <div
-                class="file-box bs3-primary preview-image"
-                style="margin-top: 25px; display: flex"
-              >
-                <input
-                  class="upload-name"
-                  value="Choose image"
-                  disabled="disabled"
-                />
-                <label for="input-file" class="file-input-label"
-                  >Upload Image</label
-                >
-                <input
-                  type="file"
-                  id="input-file"
-                  class="upload-hidden form-control-file member-image"
-                  name="memberImage"
-                />
+      <div class="main-container">
+        <div class="auth-card">
+          <!-- Left Section with Brand -->
+          <div class="left-section">
+            <div class="brand-showcase">
+              <div class="logo-container">
+                <div class="logo-text">FB</div>
               </div>
-              <p class="thumbnail-desc">
-                Please upload restaurant image.<br />
-                Attention only:.jpg, .jpeg, or .png. <br />
-                formats allowed!
+
+              <div class="brand-metrics">
+                <div class="metric">
+                  <div class="metric-number">500+</div>
+                  <div class="metric-label">Restaurants</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-number">50K+</div>
+                  <div class="metric-label">Orders/Day</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-number">99.9%</div>
+                  <div class="metric-label">Uptime</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="welcome-text">
+              <h1 class="welcome-title">Join FastBite</h1>
+              <p class="welcome-subtitle">
+                Create your admin account and start managing your restaurant
+                operations efficiently.
               </p>
             </div>
           </div>
+
+          <!-- Right Section with Signup Form -->
+          <div class="right-section">
+            <div class="form-container active">
+              <div class="form-title">Create Admin Account</div>
+
+              <form onsubmit="handleSignup(event)">
+                <div class="form-group">
+                  <label>Business Name</label>
+                  <input
+                    type="text"
+                    class="form-input"
+                    placeholder="Restaurant or chain name"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label>Administrator Name</label>
+                  <input
+                    type="text"
+                    class="form-input"
+                    placeholder="Your full name"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label>Business Email</label>
+                  <input
+                    type="email"
+                    class="form-input"
+                    placeholder="admin@yourbusiness.com"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label>Phone Number</label>
+                  <input
+                    type="tel"
+                    class="form-input"
+                    placeholder="+82 10-1234-5678"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label>Business Logo</label>
+                  <div class="image-upload-container">
+                    <div class="image-preview" id="imagePreview">
+                      <div class="upload-placeholder">
+                        <svg
+                          width="48"
+                          height="48"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#9ca3af"
+                          stroke-width="1.5"
+                        >
+                          <rect
+                            x="3"
+                            y="3"
+                            width="18"
+                            height="18"
+                            rx="2"
+                            ry="2"
+                          />
+                          <circle cx="9" cy="9" r="2" />
+                          <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                        </svg>
+                        <p>Upload business logo</p>
+                        <span>PNG, JPG up to 5MB</span>
+                      </div>
+                    </div>
+                    <input
+                      type="file"
+                      class="file-input"
+                      id="logoUpload"
+                      accept="image/*"
+                      onchange="handleImageUpload(event)"
+                    />
+                    <button
+                      type="button"
+                      class="upload-btn"
+                      onclick="triggerFileInput()"
+                    >
+                      Choose File
+                    </button>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Password</label>
+                  <input
+                    type="password"
+                    class="form-input"
+                    placeholder="Create secure password"
+                    required
+                  />
+                </div>
+
+                <button type="submit" class="submit-btn">Create Account</button>
+
+                <a href="/admin" class="back-link">
+                  <button
+                    type="button"
+                    class="submit-btn back-btn"
+                    onclick="showSelector()"
+                  >
+                    ← Back
+                  </button></a
+                >
+              </form>
+
+              <div class="social-section">
+                <div class="social-divider">
+                  <span>or register with</span>
+                </div>
+                <div class="social-buttons">
+                  <button class="social-btn"><span>G</span> Google</button>
+                  <button class="social-btn"><span>K</span> KakaoTalk</button>
+                </div>
+              </div>
+
+              <div class="auth-links">
+                <p>
+                  Already have an account? <a href="/admin/login">Sign In</a>
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <input name="memberType" value="RESTAURANT" hidden />
-
-        <button class="signup-btn btn" name="signup" type="submit">
-          Signup
-        </button>
       </div>
-    </form>
-  </div>
 
-  <script type="text/javascript" src="/js/signup.js"></script>
+      <script type="text/javascript" src="/js/signup.js"></script>
+    </body>
+
+    <%- include('includes/footer') %>
+  </html>
 </body>
-
-<%- include('includes/footer') %>

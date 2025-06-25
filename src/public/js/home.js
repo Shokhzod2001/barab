@@ -1,98 +1,79 @@
-console.log("Home frontend javascript file");
-
-function fitElementToParent(el, padding) {
-  let timeout = null;
-
-  function resize() {
-    if (timeout) clearTimeout(timeout);
-    anime.set(el, { scale: 1 });
-    let pad = padding || 0,
-      parentEl = el.parentNode,
-      elOffsetWidth = el.offsetWidth - pad,
-      parentOffsetWidth = parentEl.offsetWidth,
-      ratio = parentOffsetWidth / elOffsetWidth;
-    timeout = setTimeout(anime.set(el, { scale: ratio }), 10);
-  }
-
-  resize();
-  window.addEventListener("resize", resize);
+// Navigation functions
+function navigateToLogin() {
+  window.location.href = "/admin/login";
 }
 
-(function () {
-  const sphereEl = document.querySelector(".sphere-animation"),
-    spherePathEls = sphereEl.querySelectorAll(".sphere path"),
-    pathLength = spherePathEls.length,
-    animations = [];
+function navigateToSignup() {
+  window.location.href = "/admin/signup";
+}
 
-  fitElementToParent(sphereEl);
+// Enhanced button interactions
+document.addEventListener("DOMContentLoaded", function () {
+  // Add subtle button interactions
+  document.querySelectorAll(".action-btn").forEach((btn) => {
+    btn.addEventListener("mouseenter", function () {
+      this.style.transform = "translateY(-3px) scale(1.02)";
+    });
 
-  const breathAnimation = anime({
-    begin: function () {
-      for (let i = 0; i < pathLength; i++) {
-        animations.push(
-          anime({
-            targets: spherePathEls[i],
-            stroke: {
-              value: ["rgba(255,75,75,1)", "rgba(80,80,80,.35)"],
-              duration: 500,
-            },
-            translateX: [2, -4],
-            translateY: [2, -4],
-            easing: "easeOutQuad",
-            autoplay: false,
-          })
-        );
+    btn.addEventListener("mouseleave", function () {
+      if (!this.classList.contains("active")) {
+        this.style.transform = "translateY(0) scale(1)";
       }
-    },
-    update: function (ins) {
-      animations.forEach(function (animation, i) {
-        let percent = (1 - Math.sin(i * 0.35 + 0.0022 * ins.currentTime)) / 2;
-        animation.seek(animation.duration * percent);
-      });
-    },
-    duration: Infinity,
-    autoplay: false,
+    });
+
+    // Add click animation
+    btn.addEventListener("click", function () {
+      this.style.transform = "translateY(-1px) scale(0.98)";
+      setTimeout(() => {
+        this.style.transform = "translateY(-3px) scale(1.02)";
+      }, 150);
+    });
   });
 
-  const introAnimation = anime
-    .timeline({
-      autoplay: false,
-    })
-    .add(
-      {
-        targets: spherePathEls,
-        strokeDashoffset: {
-          value: [anime.setDashoffset, 0],
-          duration: 3900,
-          easing: "easeInOutCirc",
-          delay: anime.stagger(190, { direction: "reverse" }),
-        },
-        duration: 2000,
-        delay: anime.stagger(60, { direction: "reverse" }),
-        easing: "linear",
-      },
-      0
-    );
+  // Add ripple effect to buttons
+  document.querySelectorAll(".action-btn").forEach((button) => {
+    button.addEventListener("click", function (e) {
+      const ripple = document.createElement("span");
+      const rect = this.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      const x = e.clientX - rect.left - size / 2;
+      const y = e.clientY - rect.top - size / 2;
 
-  const shadowAnimation = anime(
-    {
-      targets: "#sphereGradient",
-      x1: "25%",
-      x2: "25%",
-      y1: "0%",
-      y2: "75%",
-      duration: 30000,
-      easing: "easeOutQuint",
-      autoplay: false,
-    },
-    0
-  );
+      ripple.style.cssText = `
+                position: absolute;
+                width: ${size}px;
+                height: ${size}px;
+                left: ${x}px;
+                top: ${y}px;
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                transform: scale(0);
+                animation: ripple 0.6s ease-out;
+                pointer-events: none;
+            `;
 
-  function init() {
-    introAnimation.play();
-    breathAnimation.play();
-    shadowAnimation.play();
-  }
+      this.appendChild(ripple);
 
-  init();
-})();
+      setTimeout(() => {
+        ripple.remove();
+      }, 600);
+    });
+  });
+
+  // Add CSS for ripple animation
+  const style = document.createElement("style");
+  style.textContent = `
+        @keyframes ripple {
+            to {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+        
+        .action-btn {
+            position: relative;
+            overflow: hidden;
+        }
+    `;
+  document.head.appendChild(style);
+});
