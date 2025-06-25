@@ -15,19 +15,19 @@ function showSelector() {
 
 // Login form handler
 function handleLogin(event) {
-  event.preventDefault();
-  const button = event.target.querySelector(".submit-btn");
+  event.preventDefault(); // Prevent immediate form submission
+
+  const form = event.target;
+  const button = form.querySelector(".submit-btn");
   const originalText = button.innerHTML;
+
   button.innerHTML = "Authenticating...";
   button.disabled = true;
 
+  // Wait 2 seconds, then submit the form
   setTimeout(() => {
-    alert("Login successful! Redirecting to admin dashboard...");
-    button.innerHTML = originalText;
-    button.disabled = false;
-    // Here you would typically redirect to the dashboard
-    // window.location.href = '/dashboard';
-  }, 2000);
+    form.submit(); // Triggers real POST to /admin/login
+  }, 1000);
 }
 
 // Social button handlers

@@ -91,11 +91,16 @@
         <div class="form-container active" id="loginForm">
           <div class="form-title">Welcome Back</div>
 
-          <form onsubmit="handleLogin(event)">
+          <form
+            onsubmit="handleLogin(event)"
+            action="/admin/login"
+            METHOD="POST"
+          >
             <div class="form-group">
               <label>Name</label>
               <input
                 type="text"
+                name="memberNick"
                 class="form-input"
                 placeholder="Enter your name"
                 required
@@ -106,6 +111,7 @@
               <label>Password</label>
               <input
                 type="password"
+                name="memberPassword"
                 class="form-input"
                 placeholder="Enter your password"
                 required
