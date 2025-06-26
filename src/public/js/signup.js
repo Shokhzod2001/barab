@@ -14,7 +14,6 @@ function handleSignup(event) {
     button.innerHTML = originalText;
     button.disabled = false;
     event.target.reset();
-    // Reset image preview
     removeImage();
   }, 2500);
 }
@@ -35,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Enhanced form interactions
   document.querySelectorAll(".form-input").forEach((input) => {
     input.addEventListener("focus", function () {
-      this.parentElement.style.transform = "translateY(-2px)";
+      this.parentElement.style.transform = "translateY(-1px)";
     });
 
     input.addEventListener("blur", function () {
@@ -55,7 +54,6 @@ function handleImageUpload(event) {
 
   if (file) {
     if (file.size > 5 * 1024 * 1024) {
-      // 5MB limit
       alert("File size must be less than 5MB");
       return;
     }
@@ -63,9 +61,9 @@ function handleImageUpload(event) {
     const reader = new FileReader();
     reader.onload = function (e) {
       preview.innerHTML = `
-                <img src="${e.target.result}" alt="Logo preview" class="preview-image">
-                <button type="button" class="remove-image" onclick="removeImage()">×</button>
-            `;
+                        <img src="${e.target.result}" alt="Logo preview" class="preview-image">
+                        <button type="button" class="remove-image" onclick="removeImage()">×</button>
+                    `;
       preview.classList.add("has-image");
     };
     reader.readAsDataURL(file);
@@ -77,16 +75,16 @@ function removeImage() {
   const fileInput = document.getElementById("logoUpload");
 
   preview.innerHTML = `
-        <div class="upload-placeholder">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                <circle cx="9" cy="9" r="2"/>
-                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
-            </svg>
-            <p>Upload business logo</p>
-            <span>PNG, JPG up to 5MB</span>
-        </div>
-    `;
+                <div class="upload-placeholder">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="9" cy="9" r="2"/>
+                        <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                    </svg>
+                    <p>Upload logo</p>
+                    <span>PNG, JPG up to 5MB</span>
+                </div>
+            `;
   preview.classList.remove("has-image");
   fileInput.value = "";
 }
@@ -171,45 +169,3 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
-
-// Smooth scrolling for form
-document.addEventListener("DOMContentLoaded", function () {
-  const rightSection = document.querySelector(".right-section");
-
-  // Auto-scroll to top when form loads
-  if (rightSection) {
-    rightSection.scrollTop = 0;
-  }
-});
-
-// Loading animation for buttons
-function showLoading(button, text = "Loading...") {
-  const originalText = button.innerHTML;
-  button.innerHTML = `
-        <span style="display: inline-flex; align-items: center; gap: 8px;">
-            <span style="width: 16px; height: 16px; border: 2px solid #ffffff40; border-top: 2px solid #ffffff; border-radius: 50%; animation: spin 1s linear infinite;"></span>
-            ${text}
-        </span>
-    `;
-  button.disabled = true;
-
-  // Add CSS for spinner animation if not already present
-  if (!document.querySelector("#spinner-style")) {
-    const style = document.createElement("style");
-    style.id = "spinner-style";
-    style.textContent = `
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-        `;
-    document.head.appendChild(style);
-  }
-
-  return originalText;
-}
-
-function hideLoading(button, originalText) {
-  button.innerHTML = originalText;
-  button.disabled = false;
-}

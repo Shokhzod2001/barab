@@ -100,44 +100,46 @@
               <div class="form-title">Create Admin Account</div>
 
               <form onsubmit="handleSignup(event)">
-                <div class="form-group">
-                  <label>Business Name</label>
-                  <input
-                    type="text"
-                    class="form-input"
-                    placeholder="Restaurant or chain name"
-                    required
-                  />
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Business Name</label>
+                    <input
+                      type="text"
+                      class="form-input"
+                      placeholder="Restaurant name"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Administrator Name</label>
+                    <input
+                      type="text"
+                      class="form-input"
+                      placeholder="Your full name"
+                      required
+                    />
+                  </div>
                 </div>
 
-                <div class="form-group">
-                  <label>Administrator Name</label>
-                  <input
-                    type="text"
-                    class="form-input"
-                    placeholder="Your full name"
-                    required
-                  />
-                </div>
-
-                <div class="form-group">
-                  <label>Business Email</label>
-                  <input
-                    type="email"
-                    class="form-input"
-                    placeholder="admin@yourbusiness.com"
-                    required
-                  />
-                </div>
-
-                <div class="form-group">
-                  <label>Phone Number</label>
-                  <input
-                    type="tel"
-                    class="form-input"
-                    placeholder="+82 10-1234-5678"
-                    required
-                  />
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Business Email</label>
+                    <input
+                      type="email"
+                      class="form-input"
+                      placeholder="admin@business.com"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Phone Number</label>
+                    <input
+                      type="tel"
+                      class="form-input"
+                      placeholder="+82 10-1234-5678"
+                      required
+                    />
+                  </div>
                 </div>
 
                 <div class="form-group">
@@ -146,8 +148,8 @@
                     <div class="image-preview" id="imagePreview">
                       <div class="upload-placeholder">
                         <svg
-                          width="48"
-                          height="48"
+                          width="32"
+                          height="32"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="#9ca3af"
@@ -164,7 +166,7 @@
                           <circle cx="9" cy="9" r="2" />
                           <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
                         </svg>
-                        <p>Upload business logo</p>
+                        <p>Upload logo</p>
                         <span>PNG, JPG up to 5MB</span>
                       </div>
                     </div>
@@ -197,15 +199,13 @@
 
                 <button type="submit" class="submit-btn">Create Account</button>
 
-                <a href="/admin" class="back-link">
-                  <button
-                    type="button"
-                    class="submit-btn back-btn"
-                    onclick="showSelector()"
-                  >
-                    ← Back
-                  </button></a
+                <button
+                  type="button"
+                  class="submit-btn back-btn"
+                  onclick="window.location.href='/admin'"
                 >
+                  ← Back
+                </button>
               </form>
 
               <div class="social-section">
