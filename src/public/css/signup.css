@@ -281,15 +281,8 @@ body {
   text-align: center;
 }
 
-.form-row {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 16px;
-}
-
 .form-group {
   margin-bottom: 16px;
-  flex: 1;
 }
 
 .form-group label {
@@ -317,6 +310,16 @@ body {
   background: #fff;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
   transform: translateY(-1px);
+}
+
+.form-input.error {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.form-input.valid {
+  border-color: #10b981;
+  background: #f0fdf4;
 }
 
 .image-upload-container {
@@ -458,6 +461,17 @@ body {
   box-shadow: 0 12px 28px rgba(107, 114, 128, 0.3);
 }
 
+.error-message {
+  color: #ef4444;
+  font-size: 0.7rem;
+  margin-top: 4px;
+  display: none;
+}
+
+.error-message.show {
+  display: block;
+}
+
 .social-section {
   margin-top: 20px;
   text-align: center;
@@ -569,11 +583,6 @@ body {
 
   .right-section {
     padding: 25px 20px;
-  }
-
-  .form-row {
-    flex-direction: column;
-    gap: 0;
   }
 
   .social-buttons {

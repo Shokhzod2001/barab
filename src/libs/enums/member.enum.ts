@@ -9,3 +9,9 @@ export enum MemberStatus {
   BLOCK = "BLOCK",
   DELETE = "DELETE",
 }
+
+export enum MemberShift {
+  MORNING = "MORNING",
+  EVENING = "EVENING",
+  NIGHT = "NIGHT",
+}

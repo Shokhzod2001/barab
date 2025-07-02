@@ -112,11 +112,11 @@ const productSchema = new Schema(
 
     combos: [
       {
-        comboName: String,
-        comboPrice: Number,
-        comboItems: [String], // Array of menu item IDs
-        comboDrink: String,
-        comboSide: String,
+        comboName: { type: String, required: true },
+        comboPrice: { type: Number, required: true, min: 0 },
+        comboItems: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+        comboDrink: { type: String },
+        comboSide: { type: String },
       },
     ],
   },
@@ -143,8 +143,8 @@ productSchema.index(
 // Static methods
 productSchema.statics.findAvailable = function () {
   return this.find({
-    menuStatus: ProductStatus.PROCESS,
-    menuLeftCount: { $gt: 0 },
+    productStatus: ProductStatus.PROCESS,
+    productLeftCount: { $gt: 0 },
   });
 };
 
@@ -159,7 +159,7 @@ productSchema.statics.findPopular = function () {
   return this.find({
     isPopular: true,
     productStatus: ProductStatus.PROCESS,
-  }).sort({ menuOrders: -1 });
+  }).sort({ productOrders: -1 });
 };
 
 productSchema.statics.findByPriceRange = function (minPrice, maxPrice) {

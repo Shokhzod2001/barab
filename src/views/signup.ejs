@@ -12,7 +12,6 @@
       <link rel="stylesheet" href="signup.css" />
     </head>
     <body>
-      <!-- Geometric Background -->
       <div class="geometric-bg">
         <div
           class="shape circle"
@@ -66,16 +65,16 @@
           <div class="left-section">
             <div class="brand-showcase">
               <div class="logo-container">
-                <div class="logo-text">FB</div>
+                <div class="logo-text">BARAB</div>
               </div>
 
               <div class="brand-metrics">
                 <div class="metric">
-                  <div class="metric-number">500+</div>
+                  <div class="metric-number">50+</div>
                   <div class="metric-label">Restaurants</div>
                 </div>
                 <div class="metric">
-                  <div class="metric-number">50K+</div>
+                  <div class="metric-number">5K+</div>
                   <div class="metric-label">Orders/Day</div>
                 </div>
                 <div class="metric">
@@ -86,10 +85,11 @@
             </div>
 
             <div class="welcome-text">
-              <h1 class="welcome-title">Join FastBite</h1>
+              <h1 class="welcome-title">Join Barab</h1>
               <p class="welcome-subtitle">
-                Create your admin account and start managing your restaurant
-                operations efficiently.
+                Deliver faster service and better experiences. Manage
+                high-volume orders, optimize kitchen operations, and track
+                customer satisfaction—all from one powerful dashboard.
               </p>
             </div>
           </div>
@@ -99,51 +99,44 @@
             <div class="form-container active">
               <div class="form-title">Create Admin Account</div>
 
-              <form onsubmit="handleSignup(event)">
-                <div class="form-row">
-                  <div class="form-group">
-                    <label>Business Name</label>
-                    <input
-                      type="text"
-                      class="form-input"
-                      placeholder="Restaurant name"
-                      required
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label>Administrator Name</label>
-                    <input
-                      type="text"
-                      class="form-input"
-                      placeholder="Your full name"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group">
-                    <label>Business Email</label>
-                    <input
-                      type="email"
-                      class="form-input"
-                      placeholder="admin@business.com"
-                      required
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label>Phone Number</label>
-                    <input
-                      type="tel"
-                      class="form-input"
-                      placeholder="+82 10-1234-5678"
-                      required
-                    />
+              <form
+                onsubmit="handleSignup(event)"
+                action="/admin/signup"
+                method="POST"
+                enctype="multipart/form-data"
+              >
+                <div class="form-group">
+                  <label>Name</label>
+                  <input
+                    type="text"
+                    class="form-input"
+                    id="name"
+                    name="memberNick"
+                    placeholder="Your full name"
+                    required
+                  />
+                  <div class="error-message" id="nameError">
+                    Please enter your name
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label>Business Logo</label>
+                  <label>Phone Number</label>
+                  <input
+                    type="tel"
+                    class="form-input"
+                    id="phone"
+                    name="memberPhone"
+                    placeholder="+82 10-1234-5678"
+                    required
+                  />
+                  <div class="error-message" id="phoneError">
+                    Please enter a valid phone number
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Profile Picture</label>
                   <div class="image-upload-container">
                     <div class="image-preview" id="imagePreview">
                       <div class="upload-placeholder">
@@ -166,14 +159,15 @@
                           <circle cx="9" cy="9" r="2" />
                           <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
                         </svg>
-                        <p>Upload logo</p>
+                        <p>Upload profile picture</p>
                         <span>PNG, JPG up to 5MB</span>
                       </div>
                     </div>
                     <input
                       type="file"
                       class="file-input"
-                      id="logoUpload"
+                      id="profileUpload"
+                      name="memberImage"
                       accept="image/*"
                       onchange="handleImageUpload(event)"
                     />
@@ -192,9 +186,28 @@
                   <input
                     type="password"
                     class="form-input"
+                    id="password"
+                    name="memberPassword"
                     placeholder="Create secure password"
                     required
                   />
+                  <div class="error-message" id="passwordError">
+                    Password must be at least 8 characters
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Repeat Password</label>
+                  <input
+                    type="password"
+                    class="form-input"
+                    id="repeatPassword"
+                    placeholder="Confirm your password"
+                    required
+                  />
+                  <div class="error-message" id="repeatPasswordError">
+                    Passwords do not match
+                  </div>
                 </div>
 
                 <button type="submit" class="submit-btn">Create Account</button>
@@ -214,7 +227,6 @@
                 </div>
                 <div class="social-buttons">
                   <button class="social-btn"><span>G</span> Google</button>
-                  <button class="social-btn"><span>K</span> KakaoTalk</button>
                 </div>
               </div>
 

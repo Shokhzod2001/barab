@@ -19,7 +19,6 @@ function handleLogin(event) {
 
   const form = event.target;
   const button = form.querySelector(".submit-btn");
-  const originalText = button.innerHTML;
 
   button.innerHTML = "Authenticating...";
   button.disabled = true;
@@ -27,22 +26,11 @@ function handleLogin(event) {
   // Wait 2 seconds, then submit the form
   setTimeout(() => {
     form.submit(); // Triggers real POST to /admin/login
-  }, 1000);
+  }, 500);
 }
 
 // Social button handlers
 document.addEventListener("DOMContentLoaded", function () {
-  document.querySelectorAll(".social-btn").forEach((btn) => {
-    btn.addEventListener("click", function () {
-      const provider = this.textContent.includes("Google")
-        ? "Google"
-        : "KakaoTalk";
-      alert(
-        `${provider} integration available in enterprise plans. Contact support for setup.`
-      );
-    });
-  });
-
   // Enhanced form interactions
   document.querySelectorAll(".form-input").forEach((input) => {
     input.addEventListener("focus", function () {
