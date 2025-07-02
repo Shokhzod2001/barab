@@ -1,10 +1,9 @@
-// src/routes/auth.ts
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import passport from "passport";
 import { AUTH_TIMER } from "../libs/config";
 import AuthService from "../models/Auth.service";
 
-// Extend session type to include our custom properties
+// Extend session with custom admin flag
 declare module "express-session" {
   interface SessionData {
     isAdminFlow?: boolean;
@@ -14,15 +13,20 @@ declare module "express-session" {
 const router = express.Router();
 const authService = new AuthService();
 
-// Helper function to handle successful authentication
+// Constants
+const GOOGLE_SCOPE = ["profile", "email"];
+const ADMIN_ROLES = ["ADMIN", "RESTAURANT", "CHEF"];
+const DEFAULT_REDIRECT = "/admin/product/all";
+
+// Reusable helper
 const handleAuthSuccess = async (
-  req: express.Request,
-  res: express.Response,
+  req: Request,
+  res: Response,
   redirectPath: string
 ) => {
   try {
     const user = req.user as any;
-    console.log("OAuth Success - Creating token for user:", {
+    console.log("OAuth Success - Creating token for:", {
       id: user._id,
       type: user.memberType,
       email: user.memberEmail || user.googleEmail,
@@ -32,91 +36,86 @@ const handleAuthSuccess = async (
       user.toObject ? user.toObject() : { ...user }
     );
 
-    // Set the cookie with proper settings
     res.cookie("accessToken", token, {
       maxAge: AUTH_TIMER * 60 * 60 * 1000,
       httpOnly: true,
-      secure: false, // ✅ Force false for localhost
-      sameSite: "lax", // ✅ Allow redirect to receive cookie
-      path: "/", // ✅ Keep this
+      secure: false,
+      sameSite: "lax",
+      path: "/",
     });
 
-    console.log("Token created and cookie set, redirecting to:", redirectPath);
+    console.log("Token set. Redirecting to:", redirectPath);
     res.redirect(redirectPath);
   } catch (error) {
-    console.error("OAuth callback error:", error);
+    console.error("OAuth Error:", error);
     res.send(
       `<script>alert("Authentication failed: ${error}"); window.location.replace("/login");</script>`
     );
   }
 };
 
-// REGULAR USER OAUTH (for customer interface)
-// ===========================================
+// ========================
+// Google OAuth Entry Routes
+// ========================
 
-// Google OAuth routes for regular users
+// Regular user
 router.get(
   "/google",
   passport.authenticate("google", {
-    scope: ["profile", "email"],
+    scope: GOOGLE_SCOPE,
     prompt: "select_account",
   })
 );
 
-// ADMIN OAUTH (for admin interface)
-// =================================
-
-// Google OAuth routes for admin - set session flag before redirect
+// Admin user (with session flag)
 router.get(
   "/admin/google",
-  (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    // Set flag to indicate this is admin flow
+  (req: Request, _res: Response, next: NextFunction) => {
     req.session.isAdminFlow = true;
-    console.log("Admin Google OAuth - Setting admin flow flag");
+    console.log("Admin OAuth - isAdminFlow flag set");
     next();
   },
   passport.authenticate("google", {
-    scope: ["profile", "email"],
+    scope: GOOGLE_SCOPE,
     prompt: "select_account",
   })
 );
 
-// SINGLE CALLBACK ROUTE FOR BOTH FLOWS
-// ====================================
+// ==========================
+// Unified Google Callback
+// ==========================
 
 router.get(
   "/google/callback",
   passport.authenticate("google", {
     failureRedirect: "/login?error=google_auth_failed",
   }),
-  async (req: express.Request, res: express.Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     const isAdmin = req.session.isAdminFlow || false;
-    console.log("Google callback - Is admin flow:", isAdmin);
+    delete req.session.isAdminFlow;
 
-    if (req.session.isAdminFlow) {
-      delete req.session.isAdminFlow;
-    }
-
-    const redirectPath = "/admin/product/all";
+    console.log("Google callback - isAdminFlow:", isAdmin);
 
     if (isAdmin) {
       const user = req.user as any;
-      console.log("Verifying admin privileges for user:", {
-        type: user?.memberType,
+
+      console.log("Checking admin access for:", {
         id: user?._id,
+        role: user?.memberType,
       });
 
-      if (!user || !["ADMIN", "RESTAURANT", "CHEF"].includes(user.memberType)) {
-        console.log("Access denied - insufficient privileges");
+      if (!user || !ADMIN_ROLES.includes(user.memberType)) {
+        console.warn("Access denied: Not an admin");
         res.send(
           `<script>alert("Access denied. Admin privileges required."); window.location.replace("/admin/login");</script>`
         );
         return;
       }
-      console.log("Admin privileges verified");
+
+      console.log("Admin access granted");
     }
 
-    return await handleAuthSuccess(req, res, redirectPath); // ✅ await and return
+    await handleAuthSuccess(req, res, DEFAULT_REDIRECT);
   }
 );
 

@@ -5,122 +5,118 @@ import router from "./router";
 import routerAdmin from "./router-admin";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
-import { MORGAN_FORMAT } from "./libs/config";
-import AuthService from "./models/Auth.service";
-
-// OAuth imports
 import passport from "passport";
 import session from "express-session";
-import authRoutes from "./libs/auth";
-import "./libs/passport";
 
-/** 1 - ENTRANCE **/
+import { MORGAN_FORMAT } from "./libs/config";
+import AuthService from "./models/Auth.service";
+import authRoutes from "./libs/auth";
+import "./libs/passport"; // load strategies
+import {
+  requireAdmin,
+  requireAuth,
+  setMemberLocals,
+} from "./libs/auth-middleware";
+
+/** App setup **/
 const app = express();
+const authService = new AuthService();
+
+/** Middleware **/
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static("./uploads"));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors({ credentials: true, origin: true }));
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
 app.use(morgan(MORGAN_FORMAT));
 
-// Add session middleware for OAuth (before passport)
+/** Session + Passport (OAuth) **/
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "your-fallback-secret",
+    secret: process.env.SESSION_SECRET || "fallback-secret",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === "production",
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
     },
   })
 );
-
-// Add passport middleware for OAuth
 app.use(passport.initialize());
 app.use(passport.session());
 
-/** 2 - AUTHENTICATION MIDDLEWARE **/
-const authService = new AuthService();
-
-/** 3 - VIEWS **/
+/** Views **/
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
-/** 4 - ROUTERS **/
-app.use("/auth", authRoutes); // OAuth routes
-
-// In your main app.ts file, replace the adminMiddleware with this:
+/** Admin Authentication Middleware **/
+const protectedAdminRoutes = [
+  "/admin/product",
+  "/admin/order",
+  "/admin/member",
+];
 
 const adminMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  // Debug: Log all cookies
-  console.log("All cookies:", req.cookies);
-  console.log("Headers:", req.headers.cookie);
+  try {
+    const token = req.cookies?.accessToken;
+    let member = null;
 
-  const token = req.cookies["accessToken"] || req.cookies.accessToken;
-  let member = null;
-
-  console.log("Token found:", !!token);
-
-  if (token) {
-    try {
-      member = await authService.checkAuth(token);
-      console.log("Admin middleware - Member found:", member?._id);
-    } catch (err) {
-      console.log("Invalid or expired token:", err);
-      res.clearCookie("accessToken");
-      // Also try clearing with different options
-      res.clearCookie("accessToken", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-      });
+    if (token) {
+      try {
+        member = await authService.checkAuth(token);
+      } catch (err) {
+        console.warn("Invalid or expired token");
+        res.clearCookie("accessToken", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+        });
+      }
     }
-  } else {
-    console.log("Admin middleware - No access token found");
-  }
 
-  res.locals.member = member;
+    res.locals.member = member;
 
-  // Check if this is a protected route
-  const protectedRoutes = ["/admin/product", "/admin/order", "/admin/member"];
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    req.path.startsWith(route)
-  );
+    const needsAuth = protectedAdminRoutes.some((route) =>
+      req.path.startsWith(route)
+    );
 
-  if (isProtectedRoute && !member) {
-    console.log("Access denied to protected route:", req.path);
-
-    // If it's an AJAX request or expects JSON, return JSON
-    if (
-      req.xhr ||
-      (req.headers.accept && req.headers.accept.indexOf("json") > -1)
-    ) {
-      res.status(401).json({
-        message: "You are not authenticated, Please login first!",
-      });
+    if (needsAuth && !member) {
+      if (req.xhr || req.headers.accept?.includes("json")) {
+        res.status(401).json({
+          message: "You are not authenticated, Please login first!",
+        });
+        return;
+      }
+      res.redirect("/admin/login");
       return;
     }
 
-    // Otherwise redirect to login
-    res.redirect("/admin/login");
-    return;
+    next();
+  } catch (error) {
+    next(error);
   }
-
-  console.log("Admin middleware - Access granted for:", req.path);
-  next();
 };
 
-// Apply the combined middleware to all admin routes
+// Global middleware - attaches member info if token exists
+app.use(setMemberLocals);
+
+/** Routers **/
+app.use("/auth", authRoutes);
+
+// Apply admin middleware to all admin routes
 app.use("/admin", adminMiddleware);
 
-app.use("/admin", routerAdmin); // SSR
-app.use("/", router); // SPA
+// Apply additional role-based middleware for specific admin routes
+app.use("/admin/secure", requireAdmin); // requires ADMIN / RESTAURANT / CHEF
+
+// Router setup
+app.use("/admin", routerAdmin);
+app.use("/", router); // Public SPA
 
 export default app;

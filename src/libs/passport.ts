@@ -1,67 +1,52 @@
-// src/libs/passport.ts
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import MemberModel from "../schema/Member.model";
 
-// Single Google OAuth Strategy that handles both flows
+// ==== Constants ====
+const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_CALLBACK_URL } =
+  process.env;
+
+// ==== Main Google Strategy ====
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      callbackURL: process.env.GOOGLE_CALLBACK_URL!, // Single callback URL
+      clientID: GOOGLE_CLIENT_ID!,
+      clientSecret: GOOGLE_CLIENT_SECRET!,
+      callbackURL: GOOGLE_CALLBACK_URL!,
       passReqToCallback: true,
     },
     async (req, accessToken, refreshToken, profile, done) => {
       try {
-        console.log("Google OAuth Profile:", profile);
-        console.log("Request URL:", req.url);
-
-        // Determine if this is admin flow based on the request path
         const isAdminFlow = req.url.includes("/admin/");
-        console.log("Is admin flow:", isAdminFlow);
+        const email = profile.emails?.[0]?.value;
 
-        // Check if user already exists by Google ID or email
-        let existingUser = await MemberModel.findOne({
-          $or: [
-            { googleId: profile.id },
-            { memberEmail: profile.emails?.[0]?.value },
-          ],
+        const existingUser = await MemberModel.findOne({
+          $or: [{ googleId: profile.id }, { memberEmail: email }],
         });
 
         if (existingUser) {
-          console.log("Existing user found:", {
-            id: existingUser._id,
-            type: existingUser.memberType,
-            email: existingUser.memberEmail,
-          });
-
-          // Update Google ID if not set
           if (!existingUser.googleId) {
             existingUser.googleId = profile.id;
             await existingUser.save();
-            console.log("Updated Google ID for existing user");
+            console.log("Updated Google ID for user:", existingUser._id);
           }
 
+          console.log("User logged in:", existingUser._id);
           return done(null, existingUser);
         }
 
-        // For admin flow, don't auto-create users
         if (isAdminFlow) {
-          console.log("Admin flow: User not found, denying access");
+          console.warn("Admin login - user not found. Denying access.");
           return done(
-            new Error(
-              "User not found. Please contact administrator for admin access."
-            ),
+            new Error("Access denied. Admin user not registered."),
             undefined
           );
         }
 
-        // Create new user for regular flow only
         const newUser = new MemberModel({
           googleId: profile.id,
           memberNick: profile.displayName,
-          memberEmail: profile.emails?.[0]?.value,
+          memberEmail: email,
           memberImage: profile.photos?.[0]?.value,
           memberStatus: "ACTIVE",
           memberType: "USER",
@@ -69,27 +54,27 @@ passport.use(
         });
 
         const savedUser = await newUser.save();
-        console.log("New Google user created:", savedUser);
+        console.log("New user registered:", savedUser._id);
+
         return done(null, savedUser);
-      } catch (error) {
-        console.error("Google OAuth error:", error);
-        return done(error, undefined);
+      } catch (err) {
+        console.error("Google OAuth error:", err);
+        return done(err, undefined);
       }
     }
   )
 );
 
-// Serialize user for session
+// ==== Session Handling ====
 passport.serializeUser((user: any, done) => {
   done(null, user._id);
 });
 
-// Deserialize user from session
 passport.deserializeUser(async (id: string, done) => {
   try {
     const user = await MemberModel.findById(id);
     done(null, user);
-  } catch (error) {
-    done(error, null);
+  } catch (err) {
+    done(err, null);
   }
 });

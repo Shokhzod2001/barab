@@ -15,7 +15,6 @@ export interface Member {
   memberImage?: string;
   memberPoints: number;
   googleId?: string;
-  kakaoId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
