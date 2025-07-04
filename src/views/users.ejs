@@ -1,134 +1,158 @@
 <%- include('includes/header') %>
 
 <link rel="stylesheet" type="text/css" href="/css/users.css" />
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.js"></script>
 
-<body class="min-h-screen bg-gray-100">
-  <header class="bg-white shadow-sm border-b">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16">
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <div
-              class="h-8 w-8 bg-orange-500 rounded-full flex items-center justify-center"
-            >
-              <span class="text-white font-bold text-sm">B</span>
-            </div>
-          </div>
-          <div class="ml-4">
-            <h1 class="text-xl font-semibold text-gray-900">
-              Barab Restaurant
-            </h1>
-            <p class="text-sm text-gray-500">Users Management</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-4">
-          <nav class="flex gap-2">
-            <a
-              href="#"
-              class="px-3 py-2 text-sm font-medium text-white bg-orange-500 rounded-lg"
-              >Users</a
-            >
-            <a
-              href="chefs.html"
-              class="px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg"
-              >Chefs</a
-            >
-            <a
-              href="products.html"
-              class="px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg"
-              >Products</a
-            >
-          </nav>
-          <button
-            onclick="handleLogout()"
-            class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-          >
-            <i data-lucide="log-out" class="w-4 h-4"></i>
-            Logout
-          </button>
+<body>
+  <!-- Animated Background Elements -->
+  <div class="background-elements">
+    <div class="bg-element bg-element-1"></div>
+    <div class="bg-element bg-element-2"></div>
+    <div class="bg-element bg-element-3"></div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <div class="logo-icon">B</div>
+        <div class="logo-text">
+          <h1>Barab Restaurant</h1>
+          <p>Admin Dashboard</p>
         </div>
       </div>
+      <a href="/admin/logout">
+        <button
+          class="logout-btn"
+          onclick="return confirm('Do you really want to logout?')"
+        >
+          <i data-lucide="log-out"></i>
+          Logout
+        </button>
+      </a>
     </div>
   </header>
 
   <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Search and Filter -->
-    <div class="flex flex-col sm:flex-row gap-4 mb-6">
-      <div class="relative flex-1">
-        <i
-          data-lucide="search"
-          class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-        ></i>
+  <main>
+    <!-- Navigation Tabs -->
+    <div class="tabs-container">
+      <a href="/admin/user/all">
+        <button class="tab-btn active">
+          <i data-lucide="users"></i>
+          <span>Users</span>
+          <div class="pulse-dot"></div>
+        </button>
+      </a>
+      <a href="/admin/chef/all">
+        <button class="tab-btn active">
+          <i data-lucide="chef-hat"></i>
+          <span>Chefs</span>
+          <div class="pulse-dot"></div>
+        </button>
+      </a>
+      <a href="/admin/product/all">
+        <button class="tab-btn active">
+          <i data-lucide="menu"></i>
+          <span>Menu</span>
+          <div class="pulse-dot"></div>
+        </button>
+      </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-container">
+      <div class="search-container">
+         <i data-lucide="search" class="search-icon"></i>
         <input
           type="text"
           id="searchInput"
-          placeholder="Search users by name, email, or phone..."
-          class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          placeholder="Search anything..."
+          oninput="handleSearch()"
+          class="search-input"
         />
       </div>
       <select
         id="statusFilter"
-        class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+        onchange="handleStatusFilter()"
+        class="status-filter"
       >
         <option value="all">All Status</option>
         <option value="active">Active</option>
-        <option value="inactive">Inactive</option>
-        <option value="blocked">Blocked</option>
+        <option value="inactive">Block</option>
+        <option value="blocked">Delete</option>
       </select>
     </div>
 
-    <!-- Users Table -->
-    <div class="bg-white rounded-lg shadow-sm border fade-in">
-      <div class="px-6 py-4 border-b">
-        <div class="flex justify-between items-center">
-          <h2 class="text-xl font-semibold text-gray-800">Users Management</h2>
-          <div class="text-sm text-gray-500">
-            Total Users: <span id="totalUsers" class="font-medium">0</span>
-          </div>
-        </div>
+    <!-- Content -->
+    <div class="users-container">
+      <div class="users-header">
+        <h2>
+          <i data-lucide="users"></i>
+          Users Management
+        </h2>
       </div>
       <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-gray-50">
+        <table class="users-table">
+          <thead>
             <tr>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                User
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Contact
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Status
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Join Date
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Orders
-              </th>
+              <th>User</th>
+              <th>Contact</th>
+              <th>Status</th>
+              <th>Join Date</th>
             </tr>
           </thead>
-          <tbody id="usersTableBody" class="bg-white divide-y divide-gray-200">
-            <!-- Users will be populated by JavaScript -->
+          <tbody id="usersTableBody">
+            <% users.forEach((user, index) => { %>
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <img
+                      src="http://localhost:3009/<%=user.memberImage%>"
+                      alt="<%= user.memberNick %>"
+                      class="user-avatar"
+                    />
+                    <div class="status-dot"></div>
+                    <div class="user-info">
+                      <div class="user-name"><%= user.memberNick %></div>
+                      <div class="user-id">
+                        ID: #<%= (index + 1).toString().padStart(3, "0") %>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="contact-cell">
+                    <div class="contact-item phone">
+                      <i data-lucide="phone"></i>
+                      <%= user.memberPhone %>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <select
+                    id="<%= user._id %>"
+                    class="member-status status-select status-<%= user.memberStatus %>"
+                  >
+                    <option value="ACTIVE" <%= user.memberStatus === 'ACTIVE' ? 'selected' : '' %>>Active</option>
+                    <option value="BLOCK" <%= user.memberStatus === 'BLOCK' ? 'selected' : '' %>>Block</option>
+                    <option value="DELETE" <%= user.memberStatus === 'DELETE' ? 'selected' : '' %>>Delete</option>
+                  </select>
+                </td>
+                <td>
+                  <div class="date-cell">
+                    <i data-lucide="clock"></i>
+                    <%= user.createdAt %>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
           </tbody>
         </table>
       </div>
     </div>
   </main>
 
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script type="text/javascript" src="/js/users.js"></script>
 </body>
 
