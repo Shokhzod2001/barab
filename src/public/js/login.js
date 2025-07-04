@@ -1,18 +1,3 @@
-// Form navigation functions
-function showForm(type) {
-  document.getElementById("actionSelector").style.display = "none";
-  document.getElementById("loginForm").classList.remove("active");
-
-  if (type === "login") {
-    document.getElementById("loginForm").classList.add("active");
-  }
-}
-
-function showSelector() {
-  document.getElementById("actionSelector").style.display = "block";
-  document.getElementById("loginForm").classList.remove("active");
-}
-
 // Login form handler
 function handleLogin(event) {
   event.preventDefault(); // Prevent immediate form submission
@@ -23,7 +8,7 @@ function handleLogin(event) {
   button.innerHTML = "Authenticating...";
   button.disabled = true;
 
-  // Wait 2 seconds, then submit the form
+  // Wait 0.5 seconds, then submit the form
   setTimeout(() => {
     form.submit(); // Triggers real POST to /admin/login
   }, 500);
@@ -44,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Add subtle button interactions
-  document.querySelectorAll(".action-btn, .submit-btn").forEach((btn) => {
+  document.querySelectorAll(".submit-btn").forEach((btn) => {
     btn.addEventListener("mouseenter", function () {
       if (!this.disabled) {
         this.style.transform = "translateY(-3px) scale(1.02)";
@@ -61,25 +46,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Add form validation
 function validateForm() {
-  const email = document.querySelector('input[type="email"]').value;
+  const name = document.querySelector('input[type="text"]').value;
   const password = document.querySelector('input[type="password"]').value;
 
-  if (!email || !password) {
+  if (!name || !password) {
     alert("Please fill in all required fields.");
     return false;
   }
 
-  if (!isValidEmail(email)) {
-    alert("Please enter a valid email address.");
-    return false;
-  }
-
   return true;
-}
-
-function isValidEmail(email) {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
 }
 
 // Add keyboard shortcuts

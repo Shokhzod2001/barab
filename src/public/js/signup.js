@@ -2,11 +2,6 @@
 function handleSignup(event) {
   event.preventDefault();
 
-  // Validate form first
-  if (!validateForm()) {
-    return;
-  }
-
   // Show loading state
   const button = event.target.querySelector(".submit-btn");
   const originalText = button.innerHTML;
