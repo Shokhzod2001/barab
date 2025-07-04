@@ -62,7 +62,7 @@
     <!-- Filters -->
     <div class="filters-container">
       <div class="search-container">
-        <i data-lucide="search" class="search-icon"></i>
+         <i data-lucide="search" class="search-icon"></i>
         <input
           type="text"
           id="searchInput"
@@ -78,8 +78,8 @@
       >
         <option value="all">All Status</option>
         <option value="active">Active</option>
-        <option value="inactive">Inactive</option>
-        <option value="blocked">Blocked</option>
+        <option value="inactive">Block</option>
+        <option value="blocked">Delete</option>
       </select>
     </div>
 
@@ -87,30 +87,83 @@
     <div class="users-container">
       <div class="users-header">
         <h2>
-          <i data-lucide="users"></i>
-          Users Management
+          <i data-lucide="chef-hat" style="color: #3b26d9;"></i>
+          Chefs Management
         </h2>
       </div>
       <div class="overflow-x-auto">
         <table class="users-table">
           <thead>
             <tr>
-              <th>User</th>
+              <th>Chef</th>
               <th>Contact</th>
               <th>Status</th>
-              <th>Join Date</th>
+              <th>Experience</th>
+              <th>Shift</th>
             </tr>
           </thead>
           <tbody id="usersTableBody">
-            <!-- Users will be dynamically inserted here -->
+            <% chefs.forEach((user, index) => { %>
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <img
+                      src="http://localhost:3009/<%=user.memberImage%>"
+                      alt="<%= user.memberNick %>"
+                      class="user-avatar"
+                    />
+                    <div class="status-dot"></div>
+                    <div class="user-info">
+                      <div class="user-name"><%= user.memberNick %></div>
+                      <div class="user-id">
+                        ID: #<%= (index + 1).toString().padStart(3, "0") %>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="contact-cell">
+                    <div class="contact-item phone">
+                      <i data-lucide="phone"></i>
+                      <%= user.memberPhone %>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <select
+                    id="<%= user._id %>"
+                    class="member-status status-select status-<%= user.memberStatus %>"
+                  >
+                    <option value="ACTIVE" <%= user.memberStatus === 'ACTIVE' ? 'selected' : '' %>>Active</option>
+                    <option value="BLOCK" <%= user.memberStatus === 'BLOCK' ? 'selected' : '' %>>Block</option>
+                    <option value="DELETE" <%= user.memberStatus === 'DELETE' ? 'selected' : '' %>>Delete</option>
+                  </select>
+                </td>
+                <td>
+                <div class="date-cell">
+                  <div class="contact-item">
+                    <i data-lucide="clock" style="color: gray;"></i>
+                    <%= user.memberExperience %> years
+                  </div>  
+                </div>
+                </td>
+                <td>
+                <div class="date-cell">
+                  <div class="contact-item shift">
+                    <%= user.memberShift %>
+                  </div>  
+                </div>
+                </td>
+              </tr>
+            <% }) %>
           </tbody>
         </table>
       </div>
     </div>
   </main>
 
-  <script type="text/javascript" src="/js/chefs.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script type="text/javascript" src="/js/chefs.js"></script>
 </body>
 
 <%- include('includes/footer') %>
