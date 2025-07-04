@@ -137,3 +137,132 @@ function showFilteredUsers(filteredUsers) {
     }
   }
 }
+
+lucide.createIcons();
+
+// Show Add Chef Form
+function showAddChefForm() {
+  document.getElementById("addChefModal").style.display = "flex";
+  document.body.style.overflow = "hidden";
+}
+
+// Hide Add Chef Form
+function hideAddChefForm() {
+  document.getElementById("addChefModal").style.display = "none";
+  document.body.style.overflow = "auto";
+  resetForm();
+}
+
+// Reset Form
+function resetForm() {
+  document.getElementById("addChefForm").reset();
+  document.getElementById("imagePreview").style.display = "none";
+  document.getElementById("imagePreview").innerHTML = "";
+  document.getElementById("memberTypeHidden").value = "USER";
+
+  // Reset role badge and container
+  const badge = document.getElementById("roleBadge");
+  const container = document.querySelector(".chef-role-toggle");
+  badge.textContent = "USER";
+  badge.className = "role-badge";
+  container.classList.remove("active");
+}
+
+// Image Preview
+document.getElementById("memberImage").addEventListener("change", function (e) {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const preview = document.getElementById("imagePreview");
+      preview.innerHTML = `<img src="${event.target.result}" alt="Preview">`;
+      preview.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+// Handle memberType checkbox
+document.getElementById("memberType").addEventListener("change", function (e) {
+  const isChef = this.checked;
+  const badge = document.getElementById("roleBadge");
+  const container = this.closest(".chef-role-toggle");
+
+  document.getElementById("memberTypeHidden").value = isChef ? "CHEF" : "USER";
+
+  // Update badge
+  badge.textContent = isChef ? "CHEF" : "USER";
+  badge.className = isChef ? "role-badge chef" : "role-badge";
+
+  // Update container styling
+  if (isChef) {
+    container.classList.add("active");
+  } else {
+    container.classList.remove("active");
+  }
+});
+
+// Form Submission
+document.getElementById("addChefForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  const formData = new FormData(this);
+  // Explicitly set memberType based on checkbox
+  formData.set(
+    "memberType",
+    document.getElementById("memberType").checked ? "CHEF" : "USER"
+  );
+
+  // Demo: Show form data in console (replace with actual API call)
+  console.log("Form Data:");
+  for (let [key, value] of formData.entries()) {
+    console.log(key, value);
+  }
+
+  // Simulate API call
+  setTimeout(() => {
+    alert("Chef added successfully! (Demo mode - check console for form data)");
+    hideAddChefForm();
+
+    // In a real application, you would make an actual API call like this:
+    /*
+                fetch('/admin/chef/create', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Chef added successfully!');
+                        hideAddChefForm();
+                        window.location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while adding the chef.');
+                });
+                */
+  }, 1000);
+});
+
+// Close modal when clicking outside
+document
+  .querySelector(".modal-overlay")
+  .addEventListener("click", function (e) {
+    if (e.target === this) {
+      hideAddChefForm();
+    }
+  });
+
+// Handle escape key
+document.addEventListener("keydown", function (e) {
+  if (
+    e.key === "Escape" &&
+    document.getElementById("addChefModal").style.display === "flex"
+  ) {
+    hideAddChefForm();
+  }
+});

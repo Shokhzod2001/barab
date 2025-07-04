@@ -160,6 +160,93 @@
         </table>
       </div>
     </div>
+
+        
+        <!-- Add Chef Button -->
+        <div class="add-chef-btn-container">
+            <button class="add-chef-btn" onclick="showAddChefForm()">
+                <i data-lucide="plus"></i> Add Chef
+            </button>
+        </div>
+
+                <!-- Add Chef Form Modal -->
+        <div class="modal-overlay" id="addChefModal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Add New Chef</h3>
+                    <button class="close-btn" onclick="hideAddChefForm()">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                
+                <form id="addChefForm" class="chef-form" enctype="multipart/form-data">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="memberNick">Chef Name</label>
+                            <input type="text" id="memberNick" name="memberNick" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="memberPhone">Phone Number</label>
+                            <input type="text" id="memberPhone" name="memberPhone" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="memberExperience">Experience (years)</label>
+                            <input type="number" id="memberExperience" name="memberExperience" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="memberShift">Shift</label>
+                            <select id="memberShift" name="memberShift" required>
+                                <option value="">Select a shift</option>
+                                <option value="Morning">Morning</option>
+                                <option value="Afternoon">Afternoon</option>
+                                <option value="Evening">Evening</option>
+                                <option value="Night">Night</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="memberType">Chef Role</label>
+                        <div class="type-option">
+                            <label class="checkbox-container chef-role-toggle">
+                                <input type="checkbox" id="memberType" name="memberType" value="CHEF">
+                                <span class="checkmark"></span>
+                                <span class="role-text">This person is a Chef</span>
+                                <span class="role-badge" id="roleBadge">USER</span>
+                            </label>
+                            <input type="hidden" name="memberType" value="USER" id="memberTypeHidden">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="memberDesc">Description</label>
+                        <textarea id="memberDesc" name="memberDesc" rows="3" placeholder="Brief description of the chef's specialties or background..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="memberImage">Chef Image</label>
+                        <div class="image-uploader">
+                            <input type="file" id="memberImage" name="memberImage" accept="image/*" required>
+                            <label for="memberImage" class="upload-label">
+                                <i data-lucide="upload"></i>
+                                <span>Click to upload image</span>
+                            </label>
+                            <div class="image-preview" id="imagePreview"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="cancel-btn" onclick="hideAddChefForm()">Cancel</button>
+                        <button type="submit" class="create-btn">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
   </main>
 
   <script src="https://unpkg.com/lucide@latest"></script>
