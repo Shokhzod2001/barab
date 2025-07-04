@@ -139,10 +139,14 @@
                   </select>
                 </td>
                 <td>
-                  <div class="date-cell">
-                    <i data-lucide="clock"></i>
-                    <%= user.createdAt %>
-                  </div>
+                <div class="date-cell">
+                  <i data-lucide="clock"></i>
+                  <%= new Date(user.createdAt).toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: '2-digit', 
+                    year: 'numeric' 
+                  }) %>
+                </div>
                 </td>
               </tr>
             <% }) %>
