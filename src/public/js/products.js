@@ -157,6 +157,14 @@ const comboItemsContainer = document.getElementById("comboItemsContainer");
 const uploadImageBtn = document.getElementById("uploadImageBtn");
 const imageUploadInput = document.getElementById("imageUploadInput");
 const timeButtons = document.querySelectorAll(".time-btn");
+const productPriceInput = document.querySelector('input[name="productPrice"]');
+const comboPriceInput = document.getElementById("comboPriceInput");
+const comboPriceSummary = document.getElementById("comboPriceSummary");
+const comboItemsTotal = document.getElementById("comboItemsTotal");
+
+// Store available products for combos
+let availableProducts = [];
+let comboItems = [];
 
 // Open modal
 openFormBtn.addEventListener("click", () => {
@@ -179,12 +187,19 @@ function setProductType(type) {
     comboTypeBtn.classList.remove("btn-primary");
     comboTypeBtn.classList.add("btn-secondary");
     comboSection.classList.add("hidden");
+
+    // Reset combo items when switching to regular
+    comboItemsContainer.innerHTML = "";
+    comboItems = [];
   } else {
     regularTypeBtn.classList.remove("btn-primary");
     regularTypeBtn.classList.add("btn-secondary");
     comboTypeBtn.classList.remove("btn-secondary");
     comboTypeBtn.classList.add("btn-primary");
     comboSection.classList.remove("hidden");
+
+    // Load products when switching to combo
+    fetchAvailableProducts();
   }
 }
 
@@ -199,50 +214,136 @@ timeButtons.forEach((button) => {
   });
 });
 
-// Add combo item
-function addComboItem() {
-  const comboId = Date.now();
+// Fetch available products for combo items
+async function fetchAvailableProducts() {
+  try {
+    // In a real app, replace this with your actual API call
+    // const response = await fetch('/api/products/available');
+    // availableProducts = await response.json();
+
+    // Mock data for demonstration
+    availableProducts = [
+      { _id: "prod1", productName: "Big Burger", productPrice: 12 },
+      { _id: "prod2", productName: "Cheese Burger", productPrice: 10 },
+      { _id: "prod3", productName: "Chicken Burger", productPrice: 11 },
+      { _id: "prod4", productName: "French Fries", productPrice: 5 },
+      { _id: "prod5", productName: "Soda", productPrice: 3 },
+    ];
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    availableProducts = [];
+  }
+}
+
+// Add product selection to combo
+async function addComboItem() {
+  if (availableProducts.length === 0) {
+    await fetchAvailableProducts();
+  }
+
+  const comboItemId = Date.now();
   const comboItem = document.createElement("div");
-  comboItem.className = "combo-item";
+  comboItem.className = "combo-product-item";
+  comboItem.dataset.id = comboItemId;
+
+  // Create product options HTML
+  const productOptions = availableProducts
+    .map(
+      (product) =>
+        `<option value="${product._id}" data-price="${product.productPrice}">${product.productName} ($${product.productPrice})</option>`
+    )
+    .join("");
+
   comboItem.innerHTML = `
-                <div class="combo-header">
-                    <h4 class="combo-title">Combo Item</h4>
-                    <button type="button" class="text-red-500 hover:text-red-700 remove-combo-btn">
+                <div class="combo-product-header">
+                    <h4 class="text-sm font-medium">Combo Product</h4>
+                    <button type="button" class="text-red-500 hover:text-red-700 remove-combo-item-btn">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>
                 </div>
-                <div class="grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-4 mt-2">
                     <div class="form-group">
-                        <label class="form-label">Combo Name*</label>
-                        <input type="text" name="comboName" class="form-input" placeholder="Combo name" required>
+                        <label class="form-label">Product*</label>
+                        <select class="form-input combo-product-select" required>
+                            <option value="">Select a product</option>
+                            ${productOptions}
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Combo Price*</label>
-                        <input type="number" name="comboPrice" class="form-input" placeholder="0.00" step="0.01" min="0" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Combo Drink</label>
-                        <input type="text" name="comboDrink" class="form-input" placeholder="Drink included">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Combo Side</label>
-                        <input type="text" name="comboSide" class="form-input" placeholder="Side included">
+                        <label class="form-label">Quantity*</label>
+                        <input type="number" class="form-input combo-product-qty" value="1" min="1" required>
                     </div>
                 </div>
             `;
+
   comboItemsContainer.appendChild(comboItem);
 
-  // Add event listener to remove button
-  const removeBtn = comboItem.querySelector(".remove-combo-btn");
+  // Add event listeners
+  const removeBtn = comboItem.querySelector(".remove-combo-item-btn");
   removeBtn.addEventListener("click", () => {
     comboItem.remove();
+    comboItems = comboItems.filter((item) => item.id !== comboItemId);
+    updateComboSummary();
+  });
+
+  const productSelect = comboItem.querySelector(".combo-product-select");
+  const qtyInput = comboItem.querySelector(".combo-product-qty");
+
+  productSelect.addEventListener("change", () => {
+    const selectedOption = productSelect.options[productSelect.selectedIndex];
+    const productId = productSelect.value;
+    const price = parseFloat(selectedOption.dataset.price);
+    const quantity = parseInt(qtyInput.value) || 1;
+
+    // Update or add combo item
+    const existingItemIndex = comboItems.findIndex(
+      (item) => item.id === comboItemId
+    );
+    if (existingItemIndex >= 0) {
+      comboItems[existingItemIndex] = {
+        id: comboItemId,
+        productId,
+        price,
+        quantity,
+      };
+    } else {
+      comboItems.push({
+        id: comboItemId,
+        productId,
+        price,
+        quantity,
+      });
+    }
+
+    updateComboSummary();
+  });
+
+  qtyInput.addEventListener("change", () => {
+    const quantity = parseInt(qtyInput.value) || 1;
+    const existingItemIndex = comboItems.findIndex(
+      (item) => item.id === comboItemId
+    );
+
+    if (existingItemIndex >= 0 && productSelect.value) {
+      comboItems[existingItemIndex].quantity = quantity;
+      updateComboSummary();
+    }
   });
 
   // Refresh Lucide icons
   lucide.createIcons();
 }
 
-addComboBtn.addEventListener("click", addComboItem);
+// Update combo summary and total price
+function updateComboSummary() {
+  const total = comboItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+  comboItemsTotal.textContent = `$${total.toFixed(2)}`;
+  comboPriceInput.value = total.toFixed(2);
+  productPriceInput.value = total.toFixed(2);
+}
 
 // Image upload
 uploadImageBtn.addEventListener("click", () => {
@@ -288,8 +389,72 @@ imageUploadInput.addEventListener("change", (e) => {
 });
 
 // Form submission
-productForm.addEventListener("submit", (e) => {
+productForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  alert("Product created successfully! (This is a demo)");
+
+  // Collect form data
+  const formData = new FormData(productForm);
+  const productData = {
+    productStatus: formData.get("productStatus"),
+    productCategory: formData.get("productCategory"),
+    productName: formData.get("productName"),
+    productPrice: parseFloat(formData.get("productPrice")),
+    productDesc: formData.get("productDesc"),
+    productSize: formData.get("productSize"),
+    productVolume: formData.get("productVolume"),
+    productSpice: formData.get("productSpice"),
+    preparationTime: parseInt(formData.get("preparationTime")) || 15,
+    calories: parseInt(formData.get("calories")) || 0,
+    productLeftCount: parseInt(formData.get("productLeftCount")) || 999,
+    tags: formData.get("tags")
+      ? formData
+          .get("tags")
+          .split(",")
+          .map((tag) => tag.trim())
+      : [],
+    isPopular: formData.get("isPopular") === "on",
+    isNewItem: formData.get("isNewItem") === "on",
+  };
+
+  // Handle available times
+  const selectedTimes = [];
+  document.querySelectorAll(".time-btn.active").forEach((btn) => {
+    selectedTimes.push(btn.textContent);
+  });
+  productData.productTime =
+    selectedTimes.length > 0 ? selectedTimes : ["ALL_DAY"];
+
+  // Handle combo if it's a combo product
+  if (comboTypeBtn.classList.contains("btn-primary")) {
+    productData.combos = [
+      {
+        comboName: formData.get("comboName"),
+        comboPrice: parseFloat(formData.get("comboPrice")),
+        comboDrink: formData.get("comboDrink"),
+        comboSide: formData.get("comboSide"),
+        comboItems: comboItems.map((item) => item.productId),
+      },
+    ];
+  }
+
+  // In a real app, you would send to your API
+  console.log("Product data to submit:", productData);
+
+  // Here you would typically:
+  // 1. Send to your backend API
+  // 2. Handle response
+  // 3. Update UI or redirect
+
+  // Demo success message
+  alert(`Product ${productData.productName} created successfully!`);
   closeModal();
+
+  // Reset form
+  productForm.reset();
+  comboItemsContainer.innerHTML = "";
+  comboItems = [];
+  comboItemsTotal.textContent = "$0.00";
 });
+
+// Initialize combo functionality
+addComboBtn.addEventListener("click", addComboItem);
