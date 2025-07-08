@@ -35,7 +35,10 @@ const memberSchema = new Schema(
     memberPassword: {
       type: String,
       select: false,
-      required: true,
+      validator: function (value: string) {
+        if ((this as any).memberType === MemberType.CHEF) return true;
+        return !!value;
+      },
     },
 
     memberAddress: {

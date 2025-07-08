@@ -150,6 +150,37 @@ restaurantController.updateChosenUSer = async (req: Request, res: Response) => {
   }
 };
 
+restaurantController.createNewChef = async (
+  req: ExtendedRequest,
+  res: Response
+) => {
+  try {
+    console.log("createNewChef");
+    console.log("req.body", req.body);
+    const file = req.file;
+    console.log("file:", file);
+    if (!file)
+      throw new Errors(HttpCode.BAD_REQUEST, Message.SOMETHING_WENT_WRONG);
+
+    const newChef: MemberInput = req.body;
+    newChef.memberImage = file?.path.replace(/\\/g, "/");
+    newChef.memberType = MemberType.CHEF;
+
+    const result = await memberService.createNewChef(newChef);
+
+    res.send(
+      `<script> alert("Succesful creation!"); window.location.replace("/admin/chef/all") </script>`
+    );
+  } catch (err) {
+    console.log("Error, createNewChef", err);
+    const message =
+      err instanceof Errors ? err.message : Message.SOMETHING_WENT_WRONG;
+    res.send(
+      `<script> alert("${message}"); window.location.replace("/admin/chef/all") </script>`
+    );
+  }
+};
+
 restaurantController.checkAuthVerification = async (
   req: ExtendedRequest,
   res: Response

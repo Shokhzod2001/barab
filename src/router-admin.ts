@@ -57,4 +57,11 @@ routerAdmin.get(
   restaurantController.getChefs
 );
 
+routerAdmin.post(
+  "/chef/create",
+  restaurantController.verifyRestaurant,
+  makeUploader("members").single("memberImage"),
+  restaurantController.createNewChef
+);
+
 export default routerAdmin;

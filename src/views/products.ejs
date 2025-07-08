@@ -3,237 +3,253 @@
 <link rel="stylesheet" type="text/css" href="/css/products.css" />
 
 <body>
-  <div class="products-container">
-    <div class="navigation-menu">
-      <ul class="nav justify-content-center">
-        <li class="nav-item" style="cursor: pointer">
-          <a class="nav-link active" href="/admin/">Home</a>
-        </li>
-        <li class="nav-item" style="cursor: pointer">
-          <a class="nav-link" href="/admin/product/all">Menu</a>
-        </li>
-        <li class="nav-item" style="cursor: pointer">
-          <a class="nav-link" href="/admin/user/all">Users</a>
-        </li>
-           <li class="nav-item" style="cursor: pointer">
-          <a class="nav-link" href="/admin/chef/all">Chefs</a>
-        </li>
-        <li
-          class="nav-item"
-          style="cursor: pointer"
-          onclick="return confirm('Do you want to logout?')"
-        >
-          <a class="nav-link" href="/admin/logout">Logout</a>
-        </li>
-      </ul>
-    </div>
-
-    <div class="restaurant-menu-frame">
-      <div class="board">
-        <div class="dishes-table">
-          <span class="new-dish-txt" style="margin-bottom: 30px">
-            RESTAURANT MENU
-          </span>
-          <table class="table table-bordered table-hover">
-            <thead class="thead-light">
-              <tr class="thead-light">
-                <th scope="col">T/r</th>
-                <th scope="col">Product Name</th>
-                <th scope="col">Product Type</th>
-                <th scope="col">Product Volume</th>
-                <th scope="col">Product Price</th>
-                <th scope="col">Product Left Count</th>
-                <th scope="col">Status</th>
-              </tr>
-            </thead>
-            <% products.map(function(value, key) { %>
-            <tbody style="background: white">
-              <td><%= key + 1 %></td>
-              <td><%= value.productName %></td>
-              <td><%= value.productCollection %></td>
-              <td>
-                <%= value.productCollection === 'DRINK' ? value.productVolume :
-                value.productSize %>
-              </td>
-              <td><%= value.productPrice %></td>
-              <td><%= value.productLeftCount %></td>
-              <td>
-                <select
-                  class="spec-select new-product-status"
-                  id="<%= value._id %>"
-                >
-                  <option value="PAUSE" <%= value.productStatus === 'PAUSE' ? 'selected': '' %>>PAUSE</option>
-                  <option value="PROCESS" <%= value.productStatus === 'PROCESS' ? 'selected': '' %>>PROCESS</option>
-                  <option value="DELETE" <%= value.productStatus === 'DELETE' ? 'selected': '' %>>DELETE</option>
-                </select>
-              </td>
-            </tbody>
-            <% }) %>
-          </table>
-          <div
-            class="long-input"
-            style="align-items: flex-end; margin-bottom: 25px"
-          >
-            <button class="btn btn-primary" id="process-btn">
-              New Product
-            </button>
-          </div>
-        </div>
-
-        <form
-        onsubmit="return validateForm()"
-          action="/admin/product/create"
-          method="POST"
-          class="dish-container"
-          enctype="multipart/form-data"
-        >
-          <div class="long-input" style="display: flex; align-items: center">
-            <span class="new-dish-txt">NEW PRODUCT DETAIL</span>
-          </div>
-          <div class="login-input-frame">
-            <div class="long-input">
-              <label>Product Name</label>
-              <input
-                type="text"
-                placeholder="Name"
-                name="productName"
-                class="product-name"
-              />
-            </div>
-            <input
-              name="productStatus"
-              value="PAUSE"
-              class="product-status"
-              hidden
-            />
-          </div>
-          <div class="half-input-frame">
-            <div class="half-input">
-              <label>Product Price</label>
-              <input
-                type="number"
-                placeholder="Price"
-                name="productPrice"
-                class="product-price"
-              />
-            </div>
-            <div class="half-input">
-              <label>Product Left Counts</label>
-              <input
-                type="number"
-                placeholder="Counts"
-                name="productLeftCount"
-                class="product-left-count"
-              />
-            </div>
-          </div>
-          <div class="half-input-frame">
-            <div class="half-input">
-              <label>Product Type</label>
-              <select class="product-collection" name="productCollection">
-                <option value="DISH" selected>Dish</option>
-                <option value="SALAD">Salad</option>
-                <option value="DESSERT">Dessert</option>
-                <option value="DRINK">Drink</option>
-                <option value="OTHER">Other</option>
-              </select>
-            </div>
-
-            <div class="half-input" id="product-collection">
-              <label>Dish Volume</label>
-              <select class="product-size" name="productSize">
-                <option value="SMALL">Small</option>
-                <option value="NORMAL" selected>Normal</option>
-                <option value="LARGE">Large</option>
-                <option value="SET">Set</option>
-              </select>
-            </div>
-
-            <div class="half-input" id="product-volume" style="display: none">
-              <label>Drink Volume</label>
-              <select class="product-volume" name="productVolume">
-                <option value="0.5">0,5 liters</option>
-                <option value="1" selected>1 liters</option>
-                <option value="1.2">1,2 liters</option>
-                <option value="1.5">1,5 liters</option>
-                <option value="2">2 liters</option>
-              </select>
-            </div>
-          </div>
-          <div class="long-input">
-            <label>Product Description</label>
-            <textarea name="productDesc" class="product-desc"></textarea>
-          </div>
-
-          <div class="img-frame">
-            <label>Product Images</label>
-            <div class="media-frame">
-              <div class="upload-img-box">
-                <img src="/img/upload.svg" class="1" id="image-section-1" />
-                <input
-                  type="file"
-                  id="file"
-                  name="productImages"
-                  class="image-one"
-                  required
-                  onchange="previewFileHandler(this, 1)"
-                />
-              </div>
-              <div class="upload-img-box">
-                <img src="/img/upload.svg" class="2" id="image-section-2" />
-                <input
-                  type="file"
-                  id="file"
-                  name="productImages"
-                  class="image-two"
-                  onchange="previewFileHandler(this, 2)"
-                />
-              </div>
-              <div class="upload-img-box">
-                <img src="/img/upload.svg" class="3" id="image-section-3" />
-                <input
-                  type="file"
-                  id="file"
-                  name="productImages"
-                  class="image-three"
-                  onchange="previewFileHandler(this, 3)"
-                />
-              </div>
-              <div class="upload-img-box">
-                <img src="/img/upload.svg" class="4" id="image-section-4" />
-                <input
-                  type="file"
-                  id="file"
-                  name="productImages"
-                  class="image-four"
-                  onchange="previewFileHandler(this, 4)"
-                />
-              </div>
-              <div class="upload-img-box">
-                <img src="/img/upload.svg" class="5" id="image-section-5" />
-                <input
-                  type="file"
-                  id="file"
-                  name="productImages"
-                  class="image-five"
-                  onchange="previewFileHandler(this, 5)"
-                />
-              </div>
-              <input name="restaurantIid" class="restaurant-id" hidden />
-            </div>
-          </div>
-
-          <div class="operation-buttons">
-            <button class="btn btn-danger" id="cancel-btn">Cancel</button>
-            <button type="submit" class="btn btn-primary" id="create-btn">
-              Create
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+  <!-- Animated Background Elements -->
+  <div class="background-elements">
+    <div class="bg-element bg-element-1"></div>
+    <div class="bg-element bg-element-2"></div>
+    <div class="bg-element bg-element-3"></div>
   </div>
 
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <div class="logo-icon">B</div>
+        <div class="logo-text">
+          <h1>Barab Restaurant</h1>
+          <p>Admin Dashboard</p>
+        </div>
+      </div>
+      <a href="/admin/logout">
+        <button
+          class="logout-btn"
+          onclick="return confirm('Do you really want to logout?')"
+        >
+          <i data-lucide="log-out"></i>
+          Logout
+        </button>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Navigation Tabs -->
+    <div class="tabs-container">
+      <a href="/admin/user/all">
+        <button class="tab-btn active">
+          <i data-lucide="users"></i>
+          <span>Users</span>
+          <div class="pulse-dot"></div>
+        </button>
+      </a>
+      <a href="/admin/chef/all">
+        <button class="tab-btn active">
+          <i data-lucide="chef-hat"></i>
+          <span>Chefs</span>
+          <div class="pulse-dot"></div>
+        </button>
+      </a>
+      <a href="/admin/product/all">
+        <button class="tab-btn active">
+          <i data-lucide="menu"></i>
+          <span>Menu</span>
+          <div class="pulse-dot"></div>
+        </button>
+      </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-container">
+      <div class="search-container">
+         <i data-lucide="search" class="search-icon"></i>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search anything..."
+          oninput="handleSearch()"
+          class="search-input"
+        />
+      </div>
+      <select
+        id="statusFilter"
+        onchange="handleStatusFilter()"
+        class="status-filter"
+      >
+        <option value="all">All Status</option>
+        <option value="active">Active</option>
+        <option value="inactive">Block</option>
+        <option value="blocked">Delete</option>
+      </select>
+    </div>
+
+    <!-- Content -->
+    <div class="users-container">
+      <div class="users-header">
+        <h2>
+          <i data-lucide="chef-hat" style="color: #3b26d9;"></i>
+          Chefs Management
+        </h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>Chef</th>
+              <th>Contact</th>
+              <th>Status</th>
+              <th>Experience</th>
+              <th>Shift</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <% products.forEach((user, index) => { %>
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <img
+                      src="http://localhost:3009/<%=user.memberImage%>"
+                      alt="<%= user.memberNick %>"
+                      class="user-avatar"
+                    />
+                    <div class="status-dot"></div>
+                    <div class="user-info">
+                      <div class="user-name"><%= user.memberNick %></div>
+                      <div class="user-id">
+                        ID: #<%= (index + 1).toString().padStart(3, "0") %>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="contact-cell">
+                    <div class="contact-item phone">
+                      <i data-lucide="phone"></i>
+                      <%= user.memberPhone %>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <select
+                    id="<%= user._id %>"
+                    class="member-status status-select status-<%= user.memberStatus %>"
+                  >
+                    <option value="ACTIVE" <%= user.memberStatus === 'ACTIVE' ? 'selected' : '' %>>Active</option>
+                    <option value="BLOCK" <%= user.memberStatus === 'BLOCK' ? 'selected' : '' %>>Block</option>
+                    <option value="DELETE" <%= user.memberStatus === 'DELETE' ? 'selected' : '' %>>Delete</option>
+                  </select>
+                </td>
+                <td>
+                <div class="date-cell">
+                  <div class="contact-item">
+                    <i data-lucide="clock" style="color: gray;"></i>
+                    <%= user.memberExperience %> years
+                  </div>  
+                </div>
+                </td>
+                <td>
+                <div class="date-cell">
+                  <div class="contact-item shift">
+                    <%= user.memberShift %>
+                  </div>  
+                </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+        
+        <!-- Add Chef Button -->
+        <div class="add-chef-btn-container">
+            <button class="add-chef-btn" onclick="showAddChefForm()">
+                <i data-lucide="plus"></i> Add Chef
+            </button>
+        </div>
+
+                <!-- Add Chef Form Modal -->
+        <div class="modal-overlay" id="addChefModal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Add New Chef</h3>
+                    <button class="close-btn" onclick="hideAddChefForm()">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                
+                <form id="addChefForm" class="chef-form" enctype="multipart/form-data">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="memberNick">Chef Name</label>
+                            <input type="text" id="memberNick" name="memberNick" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="memberPhone">Phone Number</label>
+                            <input type="text" id="memberPhone" name="memberPhone" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="memberExperience">Experience (years)</label>
+                            <input type="number" id="memberExperience" name="memberExperience" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="memberShift">Shift</label>
+                            <select id="memberShift" name="memberShift" required>
+                                <option value="">Select a shift</option>
+                                <option value="Morning">Morning</option>
+                                <option value="Afternoon">Afternoon</option>
+                                <option value="Evening">Evening</option>
+                                <option value="Night">Night</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="memberType">Chef Role</label>
+                        <div class="type-option">
+                            <label class="checkbox-container chef-role-toggle">
+                                <input type="checkbox" id="memberType" name="memberType" value="CHEF">
+                                <span class="checkmark"></span>
+                                <span class="role-text">This person is a Chef</span>
+                                <span class="role-badge" id="roleBadge">USER</span>
+                            </label>
+                            <input type="hidden" name="memberType" value="USER" id="memberTypeHidden">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="memberDesc">Description</label>
+                        <textarea id="memberDesc" name="memberDesc" rows="3" placeholder="Brief description of the chef's specialties or background..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="memberImage">Chef Image</label>
+                        <div class="image-uploader">
+                            <input type="file" id="memberImage" name="memberImage" accept="image/*" required>
+                            <label for="memberImage" class="upload-label">
+                                <i data-lucide="upload"></i>
+                                <span>Click to upload image</span>
+                            </label>
+                            <div class="image-preview" id="imagePreview"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="cancel-btn" onclick="hideAddChefForm()">Cancel</button>
+                        <button type="submit" class="create-btn">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+  </main>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script type="text/javascript" src="/js/products.js"></script>
 </body>
 

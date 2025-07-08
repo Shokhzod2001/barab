@@ -1,5 +1,5 @@
 import { ObjectId } from "mongoose";
-import { MemberType, MemberStatus } from "../enums/member.enum";
+import { MemberType, MemberStatus, MemberShift } from "../enums/member.enum";
 import { Request } from "express";
 
 export interface Member {
@@ -13,6 +13,8 @@ export interface Member {
   memberAddress?: string;
   memberDesc?: string;
   memberImage?: string;
+  memberExperience: number;
+  memberShift?: MemberShift;
   memberPoints: number;
   googleId?: string;
   createdAt: Date;
@@ -28,6 +30,8 @@ export interface MemberInput {
   memberAddress?: string;
   memberDesc?: string;
   memberImage?: string;
+  memberExperience?: number;
+  memberShift?: MemberShift;
   memberPoints?: number;
 }
 
@@ -45,6 +49,8 @@ export interface MemberUpdateInput {
   memberAddress?: string;
   memberDesc?: string;
   memberImage?: string;
+  memberExperience?: number;
+  memberShift?: MemberShift;
 }
 
 export interface ExtendedRequest extends Request {

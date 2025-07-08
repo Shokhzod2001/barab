@@ -193,6 +193,22 @@ class MemberService {
 
     return result;
   }
+
+  public async createNewChef(input: MemberInput): Promise<Member> {
+    const exist = await this.memberModel
+      .findOne({ memberNick: input.memberNick, memberPhone: input.memberPhone })
+      .exec();
+    console.log("exist:", exist);
+    if (exist) throw new Errors(HttpCode.BAD_REQUEST, Message.CREATE_FAILED);
+
+    try {
+      const result = await this.memberModel.create(input);
+      return result;
+    } catch (err) {
+      console.error("Error, model:createNewChef:", err);
+      throw new Errors(HttpCode.BAD_REQUEST, Message.CREATE_FAILED);
+    }
+  }
 }
 
 export default MemberService;

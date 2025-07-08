@@ -144,6 +144,23 @@ lucide.createIcons();
 function showAddChefForm() {
   document.getElementById("addChefModal").style.display = "flex";
   document.body.style.overflow = "hidden";
+  const memberNick = $("#memberNick").val(),
+    memberPhone = $("#pmemberPhone").val(),
+    memberExperience = $("#memberExperience").val(),
+    memberShift = $("#memberShift").val(),
+    memberDesc = $("#memberDesc").val(),
+    memberImage = $("#memberImage").val();
+
+  if (
+    memberNick === "" ||
+    memberPhone === "" ||
+    memberExperience === "" ||
+    memberShift === "" ||
+    memberDesc === "" ||
+    memberImage === ""
+  ) {
+    return false;
+  } else return true;
 }
 
 // Hide Add Chef Form
@@ -180,72 +197,6 @@ document.getElementById("memberImage").addEventListener("change", function (e) {
     };
     reader.readAsDataURL(file);
   }
-});
-
-// Handle memberType checkbox
-document.getElementById("memberType").addEventListener("change", function (e) {
-  const isChef = this.checked;
-  const badge = document.getElementById("roleBadge");
-  const container = this.closest(".chef-role-toggle");
-
-  document.getElementById("memberTypeHidden").value = isChef ? "CHEF" : "USER";
-
-  // Update badge
-  badge.textContent = isChef ? "CHEF" : "USER";
-  badge.className = isChef ? "role-badge chef" : "role-badge";
-
-  // Update container styling
-  if (isChef) {
-    container.classList.add("active");
-  } else {
-    container.classList.remove("active");
-  }
-});
-
-// Form Submission
-document.getElementById("addChefForm").addEventListener("submit", function (e) {
-  e.preventDefault();
-
-  const formData = new FormData(this);
-  // Explicitly set memberType based on checkbox
-  formData.set(
-    "memberType",
-    document.getElementById("memberType").checked ? "CHEF" : "USER"
-  );
-
-  // Demo: Show form data in console (replace with actual API call)
-  console.log("Form Data:");
-  for (let [key, value] of formData.entries()) {
-    console.log(key, value);
-  }
-
-  // Simulate API call
-  setTimeout(() => {
-    alert("Chef added successfully! (Demo mode - check console for form data)");
-    hideAddChefForm();
-
-    // In a real application, you would make an actual API call like this:
-    /*
-                fetch('/admin/chef/create', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Chef added successfully!');
-                        hideAddChefForm();
-                        window.location.reload();
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while adding the chef.');
-                });
-                */
-  }, 1000);
 });
 
 // Close modal when clicking outside

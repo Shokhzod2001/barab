@@ -179,7 +179,7 @@
                     </button>
                 </div>
                 
-                <form id="addChefForm" class="chef-form" enctype="multipart/form-data">
+                <form id="addChefForm" action="/admin/chef/create" method="post" class="chef-form" enctype="multipart/form-data">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="memberNick">Chef Name</label>
@@ -202,24 +202,10 @@
                             <label for="memberShift">Shift</label>
                             <select id="memberShift" name="memberShift" required>
                                 <option value="">Select a shift</option>
-                                <option value="Morning">Morning</option>
-                                <option value="Afternoon">Afternoon</option>
-                                <option value="Evening">Evening</option>
-                                <option value="Night">Night</option>
+                                <option value="MORNING">Morning</option>
+                                <option value="EVENING">Evening</option>
+                                <option value="NIGHT">Night</option>
                             </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="memberType">Chef Role</label>
-                        <div class="type-option">
-                            <label class="checkbox-container chef-role-toggle">
-                                <input type="checkbox" id="memberType" name="memberType" value="CHEF">
-                                <span class="checkmark"></span>
-                                <span class="role-text">This person is a Chef</span>
-                                <span class="role-badge" id="roleBadge">USER</span>
-                            </label>
-                            <input type="hidden" name="memberType" value="USER" id="memberTypeHidden">
                         </div>
                     </div>
                     
