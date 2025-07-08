@@ -77,7 +77,7 @@
         class="status-filter"
       >
         <option value="all">All Status</option>
-        <option value="active">Active</option>
+        <option value="active">Process</option>
         <option value="inactive">Block</option>
         <option value="blocked">Delete</option>
       </select>
@@ -87,34 +87,34 @@
     <div class="users-container">
       <div class="users-header">
         <h2>
-          <i data-lucide="chef-hat" style="color: #3b26d9;"></i>
-          Chefs Management
+          <i data-lucide="hamburger" style="color: #3b26d9;"></i>
+         Barab Menu
         </h2>
       </div>
       <div class="overflow-x-auto">
         <table class="users-table">
           <thead>
             <tr>
-              <th>Chef</th>
-              <th>Contact</th>
+              <th>Product</th>
+              <th>Category</th>
+              <th>Price</th>
               <th>Status</th>
-              <th>Experience</th>
-              <th>Shift</th>
+              <th>Left Count</th>
             </tr>
           </thead>
           <tbody id="usersTableBody">
-            <% products.forEach((user, index) => { %>
+            <% products.forEach((product, index) => { %>
               <tr>
                 <td>
                   <div class="user-cell">
                     <img
-                      src="http://localhost:3009/<%=user.memberImage%>"
-                      alt="<%= user.memberNick %>"
+                      src="http://localhost:3009/<%=product.productImages[0]%>"
+                      alt="<%= product.productName %>"
                       class="user-avatar"
                     />
                     <div class="status-dot"></div>
                     <div class="user-info">
-                      <div class="user-name"><%= user.memberNick %></div>
+                      <div class="user-name"><%= product.productName %></div>
                       <div class="user-id">
                         ID: #<%= (index + 1).toString().padStart(3, "0") %>
                       </div>
@@ -124,33 +124,32 @@
                 <td>
                   <div class="contact-cell">
                     <div class="contact-item phone">
-                      <i data-lucide="phone"></i>
-                      <%= user.memberPhone %>
+                      <%= product.productCategory %>
                     </div>
                   </div>
                 </td>
                 <td>
-                  <select
-                    id="<%= user._id %>"
-                    class="member-status status-select status-<%= user.memberStatus %>"
-                  >
-                    <option value="ACTIVE" <%= user.memberStatus === 'ACTIVE' ? 'selected' : '' %>>Active</option>
-                    <option value="BLOCK" <%= user.memberStatus === 'BLOCK' ? 'selected' : '' %>>Block</option>
-                    <option value="DELETE" <%= user.memberStatus === 'DELETE' ? 'selected' : '' %>>Delete</option>
-                  </select>
-                </td>
-                <td>
                 <div class="date-cell">
-                  <div class="contact-item">
-                    <i data-lucide="clock" style="color: gray;"></i>
-                    <%= user.memberExperience %> years
+                  <div class="contact-item" style="font-weight: 600;">
+                    $ <%= product.productPrice %>
                   </div>  
                 </div>
                 </td>
                 <td>
+                  <select
+                    id="<%= product._id %>"
+                    class="member-status status-select status-<%= product.productStatus %>"
+                  >
+                    <option value="PROCESS" <%= product.productStatus === 'PROCESS' ? 'selected' : '' %>>Process</option>
+                    <option value="PAUSE" <%= product.productStatus === 'PAUSE' ? 'selected' : '' %>>Pause</option>
+                    <option value="DELETE" <%= product.productStatus === 'DELETE' ? 'selected' : '' %>>Delete</option>
+                  </select>
+                </td>
+                
+                <td>
                 <div class="date-cell">
                   <div class="contact-item shift">
-                    <%= user.memberShift %>
+                    <%= product.productLeftCount %>
                   </div>  
                 </div>
                 </td>
@@ -160,93 +159,204 @@
         </table>
       </div>
     </div>
+        <div class="product-form-container p-6">
+        <button id="openFormBtn" class="btn btn-primary flex items-center gap-2">
+            <i data-lucide="plus" class="w-5 h-5"></i>
+            Add Product
+        </button>
 
-        
-        <!-- Add Chef Button -->
-        <div class="add-chef-btn-container">
-            <button class="add-chef-btn" onclick="showAddChefForm()">
-                <i data-lucide="plus"></i> Add Chef
-            </button>
-        </div>
-
-                <!-- Add Chef Form Modal -->
-        <div class="modal-overlay" id="addChefModal" style="display: none;">
+        <div id="productFormModal" class="modal-overlay hidden">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Add New Chef</h3>
-                    <button class="close-btn" onclick="hideAddChefForm()">
-                        <i data-lucide="x"></i>
-                    </button>
+                <div class="p-6">
+                    <div class="form-header">
+                        <h2 class="form-title">NEW PRODUCT DETAIL</h2>
+                        <button id="closeFormBtn" class="text-gray-500 hover:text-gray-700">
+                            <i data-lucide="x" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+
+                    <form id="productForm" class="space-y-6">
+                        <!-- Product Status and Type Selection -->
+                        <div class="grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">Product Status</label>
+                                <select name="productStatus" class="form-input" required>
+                                    <option value="PROCESS" selected>PROCESS</option>
+                                    <option value="PAUSE">PAUSE</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Product Type</label>
+                                <div class="flex gap-2">
+                                    <button type="button" id="regularTypeBtn" class="flex-1 btn-primary">
+                                        Regular
+                                    </button>
+                                    <button type="button" id="comboTypeBtn" class="flex-1 btn-secondary">
+                                        Combo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product Name -->
+                        <div class="form-group">
+                            <label class="form-label">Product Name*</label>
+                            <input type="text" name="productName" class="form-input" placeholder="Enter product name" required>
+                        </div>
+
+                        <!-- Price and Category -->
+                        <div class="grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">Price*</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                                    <input type="number" name="productPrice" class="form-input pl-8" placeholder="0.00" step="0.01" min="0" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Category*</label>
+                                <select name="productCategory" class="form-input" required>
+                                    <option value="APPETIZER" selected>APPETIZER</option>
+                                    <option value="MAIN_COURSE">MAIN_COURSE</option>
+                                    <option value="DESSERT">DESSERT</option>
+                                    <option value="BEVERAGE">BEVERAGE</option>
+                                    <option value="SALAD">SALAD</option>
+                                    <option value="SOUP">SOUP</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Size and Volume -->
+                        <div class="grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">Size</label>
+                                <select name="productSize" class="form-input">
+                                    <option value="SMALL">SMALL</option>
+                                    <option value="REGULAR" selected>REGULAR</option>
+                                    <option value="LARGE">LARGE</option>
+                                    <option value="EXTRA_LARGE">EXTRA_LARGE</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Volume</label>
+                                <select name="productVolume" class="form-input">
+                                    <option value="1" selected>1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Available Times -->
+                        <div class="form-group">
+                            <label class="form-label">Available Times</label>
+                            <div class="time-selection">
+                                <button type="button" class="time-btn active">ALL_DAY</button>
+                                <button type="button" class="time-btn inactive">BREAKFAST</button>
+                                <button type="button" class="time-btn inactive">LUNCH</button>
+                                <button type="button" class="time-btn inactive">DINNER</button>
+                            </div>
+                        </div>
+
+                        <!-- Spice Level and Preparation Time -->
+                        <div class="grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">Spice Level</label>
+                                <select name="productSpice" class="form-input">
+                                    <option value="MILD">MILD</option>
+                                    <option value="MEDIUM" selected>MEDIUM</option>
+                                    <option value="HOT">HOT</option>
+                                    <option value="EXTRA_HOT">EXTRA_HOT</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Prep Time (minutes)</label>
+                                <input type="number" name="preparationTime" value="15" class="form-input" min="1">
+                            </div>
+                        </div>
+
+                        <!-- Calories and Left Count -->
+                        <div class="grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">Calories</label>
+                                <input type="number" name="calories" class="form-input" placeholder="Enter calories" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Left Count</label>
+                                <input type="number" name="productLeftCount" value="999" class="form-input" min="0">
+                            </div>
+                        </div>
+
+                        <!-- Tags -->
+                        <div class="form-group">
+                            <label class="form-label">Tags</label>
+                            <input type="text" name="tags" class="form-input" placeholder="comma separated tags (e.g., spicy, vegetarian)">
+                        </div>
+
+                        <!-- Checkboxes -->
+                        <div class="flex gap-6">
+                            <label class="flex items-center text-gray-700">
+                                <input type="checkbox" name="isPopular" class="form-checkbox">
+                                Popular Item
+                            </label>
+                            <label class="flex items-center text-gray-700">
+                                <input type="checkbox" name="isNewItem" class="form-checkbox">
+                                New Item
+                            </label>
+                        </div>
+
+                        <!-- Product Description -->
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea name="productDesc" class="form-input form-textarea" placeholder="Enter product description"></textarea>
+                        </div>
+
+                        <!-- Combo Section (initially hidden) -->
+                        <div id="comboSection" class="border-t pt-4 hidden">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-medium text-gray-800">Combo Details</h3>
+                                <button type="button" id="addComboBtn" class="btn btn-success flex items-center gap-2">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                    Add Combo
+                                </button>
+                            </div>
+                            
+                            <!-- Combo items will be added here dynamically -->
+                            <div id="comboItemsContainer"></div>
+                        </div>
+
+                        <!-- Product Images -->
+                        <div class="border-t pt-4">
+                            <label class="form-label">Product Images</label>
+                            <div class="image-upload-container">
+                                <!-- Image previews will be added here dynamically -->
+                                <button type="button" id="uploadImageBtn" class="image-upload-btn">
+                                    <i data-lucide="upload" class="text-gray-400 mb-1"></i>
+                                    <span class="text-xs text-gray-500">Upload</span>
+                                </button>
+                                <input type="file" id="imageUploadInput" accept="image/*" multiple class="hidden">
+                            </div>
+                            <p class="text-gray-500 text-sm mt-2">
+                                0/5 images uploaded (Max 5MB each)
+                            </p>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="form-footer">
+                            <button type="button" id="cancelFormBtn" class="btn btn-secondary">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                Create Product
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                
-                <form id="addChefForm" class="chef-form" enctype="multipart/form-data">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="memberNick">Chef Name</label>
-                            <input type="text" id="memberNick" name="memberNick" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="memberPhone">Phone Number</label>
-                            <input type="text" id="memberPhone" name="memberPhone" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="memberExperience">Experience (years)</label>
-                            <input type="number" id="memberExperience" name="memberExperience" min="0" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="memberShift">Shift</label>
-                            <select id="memberShift" name="memberShift" required>
-                                <option value="">Select a shift</option>
-                                <option value="Morning">Morning</option>
-                                <option value="Afternoon">Afternoon</option>
-                                <option value="Evening">Evening</option>
-                                <option value="Night">Night</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="memberType">Chef Role</label>
-                        <div class="type-option">
-                            <label class="checkbox-container chef-role-toggle">
-                                <input type="checkbox" id="memberType" name="memberType" value="CHEF">
-                                <span class="checkmark"></span>
-                                <span class="role-text">This person is a Chef</span>
-                                <span class="role-badge" id="roleBadge">USER</span>
-                            </label>
-                            <input type="hidden" name="memberType" value="USER" id="memberTypeHidden">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="memberDesc">Description</label>
-                        <textarea id="memberDesc" name="memberDesc" rows="3" placeholder="Brief description of the chef's specialties or background..."></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="memberImage">Chef Image</label>
-                        <div class="image-uploader">
-                            <input type="file" id="memberImage" name="memberImage" accept="image/*" required>
-                            <label for="memberImage" class="upload-label">
-                                <i data-lucide="upload"></i>
-                                <span>Click to upload image</span>
-                            </label>
-                            <div class="image-preview" id="imagePreview"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="button" class="cancel-btn" onclick="hideAddChefForm()">Cancel</button>
-                        <button type="submit" class="create-btn">Create</button>
-                    </div>
-                </form>
             </div>
         </div>
+    </div>
   </main>
 
   <script src="https://unpkg.com/lucide@latest"></script>

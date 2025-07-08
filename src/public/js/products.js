@@ -12,9 +12,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     return {
       _id: statusSelect.id,
-      memberNick: userCell.querySelector(".user-name").textContent.trim(),
-      memberPhone: contactCell.textContent.trim(),
-      memberStatus: statusSelect.value,
+      productName: userCell.querySelector(".user-name").textContent.trim(),
+      productCategory: contactCell.textContent.trim(),
+      productStatus: statusSelect.value,
       element: row, // Keep reference to the row element
     };
   });
@@ -22,38 +22,38 @@ document.addEventListener("DOMContentLoaded", function () {
   // Initialize existing jQuery status change handler
   $(".member-status").on("change", function (event) {
     const id = event.target.id;
-    const memberStatus = $(this).val();
+    const productStatus = $(this).val();
 
     // Change color immediately
-    $(this).removeClass("status-ACTIVE status-BLOCK status-DELETE");
-    $(this).addClass(`status-${memberStatus}`);
+    $(this).removeClass("status-PROCESS status-PAUSE status-DELETE");
+    $(this).addClass(`status-${productStatus}`);
 
     // Update database
     axios
-      .post("/admin/user/edit", {
+      .post(`/admin/product/${id}`, {
         _id: id,
-        memberStatus: memberStatus,
+        productStatus: productStatus,
       })
       .then((response) => {
         console.log("response:", response);
         const result = response.data;
 
         if (result.data) {
-          console.log("User updated!");
+          console.log("Product updated!");
           $(".member-status").blur();
 
           // Update local users array
           const userIndex = users.findIndex((user) => user._id === id);
           if (userIndex !== -1) {
-            users[userIndex].memberStatus = memberStatus;
+            users[userIndex].productStatus = productStatus;
           }
         } else {
-          alert("User update failed!");
+          alert("Product update failed!");
         }
       })
       .catch((err) => {
         console.log(err);
-        alert("User update failed!");
+        alert("Product update failed!");
       });
   });
 
@@ -72,17 +72,17 @@ function filterUsers() {
   return users.filter((user) => {
     const matchesSearch =
       searchTerm === "" ||
-      user.memberNick.toLowerCase().includes(searchTerm) ||
-      user.memberPhone.toLowerCase().includes(searchTerm);
+      user.productName.toLowerCase().includes(searchTerm) ||
+      user.productCategory.toLowerCase().includes(searchTerm);
 
     let matchesStatus = true;
     if (statusFilter !== "all") {
       if (statusFilter === "active") {
-        matchesStatus = user.memberStatus === "ACTIVE";
+        matchesStatus = user.productStatus === "PROCESS";
       } else if (statusFilter === "inactive") {
-        matchesStatus = user.memberStatus === "BLOCK";
+        matchesStatus = user.productStatus === "PAUSE";
       } else if (statusFilter === "blocked") {
-        matchesStatus = user.memberStatus === "DELETE";
+        matchesStatus = user.productStatus === "DELETE";
       }
     }
 
@@ -140,129 +140,156 @@ function showFilteredUsers(filteredUsers) {
 
 lucide.createIcons();
 
-// Show Add Chef Form
-function showAddChefForm() {
-  document.getElementById("addChefModal").style.display = "flex";
-  document.body.style.overflow = "hidden";
-}
+// Initialize Lucide icons
+lucide.createIcons();
 
-// Hide Add Chef Form
-function hideAddChefForm() {
-  document.getElementById("addChefModal").style.display = "none";
-  document.body.style.overflow = "auto";
-  resetForm();
-}
+// DOM elements
+const openFormBtn = document.getElementById("openFormBtn");
+const closeFormBtn = document.getElementById("closeFormBtn");
+const cancelFormBtn = document.getElementById("cancelFormBtn");
+const productFormModal = document.getElementById("productFormModal");
+const productForm = document.getElementById("productForm");
+const regularTypeBtn = document.getElementById("regularTypeBtn");
+const comboTypeBtn = document.getElementById("comboTypeBtn");
+const comboSection = document.getElementById("comboSection");
+const addComboBtn = document.getElementById("addComboBtn");
+const comboItemsContainer = document.getElementById("comboItemsContainer");
+const uploadImageBtn = document.getElementById("uploadImageBtn");
+const imageUploadInput = document.getElementById("imageUploadInput");
+const timeButtons = document.querySelectorAll(".time-btn");
 
-// Reset Form
-function resetForm() {
-  document.getElementById("addChefForm").reset();
-  document.getElementById("imagePreview").style.display = "none";
-  document.getElementById("imagePreview").innerHTML = "";
-  document.getElementById("memberTypeHidden").value = "USER";
-
-  // Reset role badge and container
-  const badge = document.getElementById("roleBadge");
-  const container = document.querySelector(".chef-role-toggle");
-  badge.textContent = "USER";
-  badge.className = "role-badge";
-  container.classList.remove("active");
-}
-
-// Image Preview
-document.getElementById("memberImage").addEventListener("change", function (e) {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      const preview = document.getElementById("imagePreview");
-      preview.innerHTML = `<img src="${event.target.result}" alt="Preview">`;
-      preview.style.display = "block";
-    };
-    reader.readAsDataURL(file);
-  }
+// Open modal
+openFormBtn.addEventListener("click", () => {
+  productFormModal.classList.remove("hidden");
 });
 
-// Handle memberType checkbox
-document.getElementById("memberType").addEventListener("change", function (e) {
-  const isChef = this.checked;
-  const badge = document.getElementById("roleBadge");
-  const container = this.closest(".chef-role-toggle");
+// Close modal
+function closeModal() {
+  productFormModal.classList.add("hidden");
+}
 
-  document.getElementById("memberTypeHidden").value = isChef ? "CHEF" : "USER";
+closeFormBtn.addEventListener("click", closeModal);
+cancelFormBtn.addEventListener("click", closeModal);
 
-  // Update badge
-  badge.textContent = isChef ? "CHEF" : "USER";
-  badge.className = isChef ? "role-badge chef" : "role-badge";
-
-  // Update container styling
-  if (isChef) {
-    container.classList.add("active");
+// Toggle product type
+function setProductType(type) {
+  if (type === "regular") {
+    regularTypeBtn.classList.remove("btn-secondary");
+    regularTypeBtn.classList.add("btn-primary");
+    comboTypeBtn.classList.remove("btn-primary");
+    comboTypeBtn.classList.add("btn-secondary");
+    comboSection.classList.add("hidden");
   } else {
-    container.classList.remove("active");
+    regularTypeBtn.classList.remove("btn-primary");
+    regularTypeBtn.classList.add("btn-secondary");
+    comboTypeBtn.classList.remove("btn-secondary");
+    comboTypeBtn.classList.add("btn-primary");
+    comboSection.classList.remove("hidden");
   }
+}
+
+regularTypeBtn.addEventListener("click", () => setProductType("regular"));
+comboTypeBtn.addEventListener("click", () => setProductType("combo"));
+
+// Time selection
+timeButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    button.classList.toggle("active");
+    button.classList.toggle("inactive");
+  });
 });
 
-// Form Submission
-document.getElementById("addChefForm").addEventListener("submit", function (e) {
-  e.preventDefault();
+// Add combo item
+function addComboItem() {
+  const comboId = Date.now();
+  const comboItem = document.createElement("div");
+  comboItem.className = "combo-item";
+  comboItem.innerHTML = `
+                <div class="combo-header">
+                    <h4 class="combo-title">Combo Item</h4>
+                    <button type="button" class="text-red-500 hover:text-red-700 remove-combo-btn">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <div class="grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="form-label">Combo Name*</label>
+                        <input type="text" name="comboName" class="form-input" placeholder="Combo name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Combo Price*</label>
+                        <input type="number" name="comboPrice" class="form-input" placeholder="0.00" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Combo Drink</label>
+                        <input type="text" name="comboDrink" class="form-input" placeholder="Drink included">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Combo Side</label>
+                        <input type="text" name="comboSide" class="form-input" placeholder="Side included">
+                    </div>
+                </div>
+            `;
+  comboItemsContainer.appendChild(comboItem);
 
-  const formData = new FormData(this);
-  // Explicitly set memberType based on checkbox
-  formData.set(
-    "memberType",
-    document.getElementById("memberType").checked ? "CHEF" : "USER"
-  );
-
-  // Demo: Show form data in console (replace with actual API call)
-  console.log("Form Data:");
-  for (let [key, value] of formData.entries()) {
-    console.log(key, value);
-  }
-
-  // Simulate API call
-  setTimeout(() => {
-    alert("Chef added successfully! (Demo mode - check console for form data)");
-    hideAddChefForm();
-
-    // In a real application, you would make an actual API call like this:
-    /*
-                fetch('/admin/chef/create', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Chef added successfully!');
-                        hideAddChefForm();
-                        window.location.reload();
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while adding the chef.');
-                });
-                */
-  }, 1000);
-});
-
-// Close modal when clicking outside
-document
-  .querySelector(".modal-overlay")
-  .addEventListener("click", function (e) {
-    if (e.target === this) {
-      hideAddChefForm();
-    }
+  // Add event listener to remove button
+  const removeBtn = comboItem.querySelector(".remove-combo-btn");
+  removeBtn.addEventListener("click", () => {
+    comboItem.remove();
   });
 
-// Handle escape key
-document.addEventListener("keydown", function (e) {
-  if (
-    e.key === "Escape" &&
-    document.getElementById("addChefModal").style.display === "flex"
-  ) {
-    hideAddChefForm();
+  // Refresh Lucide icons
+  lucide.createIcons();
+}
+
+addComboBtn.addEventListener("click", addComboItem);
+
+// Image upload
+uploadImageBtn.addEventListener("click", () => {
+  imageUploadInput.click();
+});
+
+imageUploadInput.addEventListener("change", (e) => {
+  const files = Array.from(e.target.files);
+  if (files.length > 5) {
+    alert("Maximum 5 images allowed");
+    return;
   }
+
+  files.forEach((file) => {
+    if (file.size > 5 * 1024 * 1024) {
+      alert(`File ${file.name} is too large (max 5MB)`);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const imagePreview = document.createElement("div");
+      imagePreview.className = "image-preview group";
+      imagePreview.innerHTML = `
+                        <img src="${event.target.result}" alt="Product preview">
+                        <button type="button" class="image-remove-btn">
+                            <i data-lucide="x" class="w-3 h-3"></i>
+                        </button>
+                    `;
+      uploadImageBtn.before(imagePreview);
+
+      // Add event listener to remove button
+      const removeBtn = imagePreview.querySelector(".image-remove-btn");
+      removeBtn.addEventListener("click", () => {
+        imagePreview.remove();
+      });
+
+      // Refresh Lucide icons
+      lucide.createIcons();
+    };
+    reader.readAsDataURL(file);
+  });
+});
+
+// Form submission
+productForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  alert("Product created successfully! (This is a demo)");
+  closeModal();
 });
