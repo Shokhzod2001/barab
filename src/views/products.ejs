@@ -78,7 +78,7 @@
       >
         <option value="all">All Status</option>
         <option value="active">Process</option>
-        <option value="inactive">Block</option>
+        <option value="inactive">Pause</option>
         <option value="blocked">Delete</option>
       </select>
     </div>
@@ -159,6 +159,8 @@
         </table>
       </div>
     </div>
+
+    <!-- Product Form Container -->
     <div class="product-form-container p-6">
         <button id="openFormBtn" class="btn btn-primary flex items-center gap-2">
             <i data-lucide="plus" class="w-5 h-5"></i>
@@ -175,26 +177,27 @@
                         </button>
                     </div>
 
-                    <form id="productForm" class="space-y-6">
+                   <form id="productForm" class="space-y-6" action="/admin/product/create" method="POST" enctype="multipart/form-data">
                         <!-- Product Status and Type Selection -->
-                        <div class="grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 gap-4">
                             <div class="form-group">
                                 <label class="form-label">Product Status</label>
                                 <select name="productStatus" class="form-input" required>
-                                    <option value="PROCESS" selected>PROCESS</option>
-                                    <option value="PAUSE">PAUSE</option>
+                                    <option value="PROCESS">PROCESS</option>
+                                    <option value="PAUSE" selected>PAUSE</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Product Type</label>
-                                <div class="flex gap-2">
-                                    <button type="button" id="regularTypeBtn" class="flex-1 btn-primary">
-                                        Regular
-                                    </button>
-                                    <button type="button" id="comboTypeBtn" class="flex-1 btn-secondary">
-                                        Combo
-                                    </button>
-                                </div>
+                            <label class="form-label">Product Type</label>
+                            <div class="flex gap-2">
+                                <button type="button" id="regularTypeBtn" class="flex-1 btn-primary" onclick="setProductType('regular')">
+                                Regular
+                                </button>
+                                <button type="button" id="comboTypeBtn" class="flex-1 btn-secondary" onclick="setProductType('combo')">
+                                Combo
+                                </button>
+                            </div>
+                            <input type="hidden" id="productType" name="productType" value="regular">
                             </div>
                         </div>
 
@@ -205,47 +208,50 @@
                         </div>
 
                         <!-- Price and Category -->
-                        <div class="grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 gap-4">
                             <div class="form-group">
-                                <label class="form-label">Price*</label>
-                                <div class="relative">
-                                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
-                                    <input type="number" name="productPrice" class="form-input pl-8" placeholder="0.00" step="0.01" min="0" required>
-                                </div>
+                            <label class="form-label">Price*</label>
+                            <input type="number" name="productPrice" class="form-input" placeholder="0" min="0" required>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Category*</label>
                                 <select name="productCategory" class="form-input" required>
-                                    <option value="APPETIZER" selected>APPETIZER</option>
-                                    <option value="MAIN_COURSE">MAIN_COURSE</option>
-                                    <option value="DESSERT">DESSERT</option>
-                                    <option value="BEVERAGE">BEVERAGE</option>
-                                    <option value="SALAD">SALAD</option>
-                                    <option value="SOUP">SOUP</option>
+                                    <option value="BURGERS" selected>BURGERS</option>
+                                    <option value="CHICKEN">CHICKEN</option>
+                                    <option value="MEXICAN">MEXICAN</option>
+                                    <option value="SIDES">SIDES</option>
+                                    <option value="BREAKFAST">BREAKFAST</option>
+                                    <option value="SALADS">SALADS</option>
+                                    <option value="DESSERTS">DESSERTS</option>
+                                    <option value="BEVERAGES">BEVERAGES</option>
+                                    <option value="SANDWICHES">SANDWICHES</option>
+                                    <option value="APPETIZERS">APPETIZERS</option>
+                                    <option value="COMBO">COMBO</option>
                                 </select>
                             </div>
                         </div>
 
                         <!-- Size and Volume -->
-                        <div class="grid-cols-2 gap-4">
-                            <div class="form-group">
-                                <label class="form-label">Size</label>
-                                <select name="productSize" class="form-input">
-                                    <option value="SMALL">SMALL</option>
-                                    <option value="REGULAR" selected>REGULAR</option>
-                                    <option value="LARGE">LARGE</option>
-                                    <option value="EXTRA_LARGE">EXTRA_LARGE</option>
-                                </select>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div id="product-collection">
+                                <div class="form-group">
+                                    <label class="form-label">Size</label>
+                                    <select name="productSize" class="form-input">
+                                        <option value="SMALL">SMALL</option>
+                                        <option value="REGULAR" selected>REGULAR</option>
+                                        <option value="LARGE">LARGE</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">Volume</label>
-                                <select name="productVolume" class="form-input">
-                                    <option value="1" selected>1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                </select>
+                            <div id="product-volume" style="display: none;">
+                                <div class="form-group">
+                                    <label class="form-label">Volume</label>
+                                    <select name="productVolume" class="form-input">
+                                        <option value="0.5">0.5 litre</option>
+                                        <option value="1" selected>1 litre</option>
+                                        <option value="1.5">1.5 litre</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -253,22 +259,26 @@
                         <div class="form-group">
                             <label class="form-label">Available Times</label>
                             <div class="time-selection">
-                                <button type="button" class="time-btn active">ALL_DAY</button>
-                                <button type="button" class="time-btn inactive">BREAKFAST</button>
-                                <button type="button" class="time-btn inactive">LUNCH</button>
-                                <button type="button" class="time-btn inactive">DINNER</button>
+                                <% const times = ['ALL_DAY', 'BREAKFAST', 'LUNCH', 'DINNER']; %>
+                                <% times.forEach(time => { %>
+                                    <button type="button" class="time-btn <%= time === 'ALL_DAY' ? 'active' : 'inactive' %>" 
+                                            onclick="toggleTime(this)">
+                                        <%= time %>
+                                    </button>
+                                    <input type="checkbox" name="productTime" value="<%= time %>" 
+                                           <%= time === 'ALL_DAY' ? 'checked' : '' %> style="display: none;">
+                                <% }); %>
                             </div>
                         </div>
 
                         <!-- Spice Level and Preparation Time -->
-                        <div class="grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 gap-4">
                             <div class="form-group">
                                 <label class="form-label">Spice Level</label>
                                 <select name="productSpice" class="form-input">
-                                    <option value="MILD">MILD</option>
+                                    <option value="NONE">NONE</option>
                                     <option value="MEDIUM" selected>MEDIUM</option>
                                     <option value="HOT">HOT</option>
-                                    <option value="EXTRA_HOT">EXTRA_HOT</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -278,7 +288,7 @@
                         </div>
 
                         <!-- Calories and Left Count -->
-                        <div class="grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 gap-4">
                             <div class="form-group">
                                 <label class="form-label">Calories</label>
                                 <input type="number" name="calories" class="form-input" placeholder="Enter calories" min="0">
@@ -295,89 +305,70 @@
                             <input type="text" name="tags" class="form-input" placeholder="comma separated tags (e.g., spicy, vegetarian)">
                         </div>
 
-                        <!-- Checkboxes -->
-                        <div class="flex gap-6">
-                            <label class="flex items-center text-gray-700">
-                                <input type="checkbox" name="isPopular" class="form-checkbox">
-                                Popular Item
-                            </label>
-                            <label class="flex items-center text-gray-700">
-                                <input type="checkbox" name="isNewItem" class="form-checkbox">
-                                New Item
-                            </label>
-                        </div>
-
                         <!-- Product Description -->
                         <div class="form-group">
                             <label class="form-label">Description</label>
                             <textarea name="productDesc" class="form-input form-textarea" placeholder="Enter product description"></textarea>
                         </div>
 
-                        <!-- Combo Section (initially hidden) -->
+                        <!-- Combo Section -->
                         <div id="comboSection" class="border-t pt-4 hidden">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-medium text-gray-800">Combo Details</h3>
-                                <button type="button" id="addComboBtn" class="btn btn-success flex items-center gap-2">
-                                    <i data-lucide="plus" class="w-4 h-4"></i>
-                                    Add Combo Item
-                                </button>
-                            </div>
-                            
-                            <!-- Combo name and price -->
-                            <div class="grid-cols-2 gap-4 mb-4">
+                            <div class="grid grid-cols-2 gap-4 mb-4">
                                 <div class="form-group">
                                     <label class="form-label">Combo Name*</label>
-                                    <input type="text" name="comboName" class="form-input" placeholder="Enter combo name" required>
+                                    <input type="text" name="comboName" class="form-input" placeholder="Enter combo name">
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Combo Price*</label>
-                                    <div class="relative">
-                                        <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
-                                        <input type="number" id="comboPriceInput" class="form-input pl-8" placeholder="0.00" step="0.01" min="0" required>
-                                    </div>
+                                <label class="form-label">Combo Price*</label>
+                                <input type="number" name="comboPrice" class="form-input" placeholder="0" min="0" >
                                 </div>
                             </div>
                             
-                            <!-- Combo drink and side -->
-                            <div class="grid-cols-2 gap-4 mb-4">
+                            <div class="grid grid-cols-2 gap-4 mb-4">
                                 <div class="form-group">
-                                    <label class="form-label">Combo Drink</label>
-                                    <input type="text" name="comboDrink" class="form-input" placeholder="Enter drink included">
+                                    <label class="form-label">Combo Drink*</label>
+                                    <select name="comboDrink" class="form-input">
+                                        <option value="">Select a drink</option>
+                                        <% availableProducts.filter(p => p.productCategory === 'BEVERAGES').forEach(product => { %>
+                                            <option value="<%= product._id %>"><%= product.productName %></option>
+                                        <% }); %>
+                                    </select>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Combo Side</label>
-                                    <input type="text" name="comboSide" class="form-input" placeholder="Enter side included">
+                                    <label class="form-label">Combo Side*</label>
+                                    <select name="comboSide" class="form-input">
+                                        <option value="">Select a side</option>
+                                        <% availableProducts.filter(p => p.productCategory === 'SIDES').forEach(product => { %>
+                                            <option value="<%= product._id %>"><%= product.productName %></option>
+                                        <% }); %>
+                                    </select>
                                 </div>
                             </div>
                             
-                            <!-- Combo items will be added here dynamically -->
-                            <div id="comboItemsContainer" class="space-y-4"></div>
-                            
-                            <!-- Combo price summary -->
-                            <div id="comboPriceSummary" class="combo-price-summary mt-4">
-                                Selected Items Total: <span id="comboItemsTotal">$0.00</span>
+                            <div class="form-group">
+                                <label class="form-label">Main Items*</label>
+                                <select name="comboItems" multiple class="form-input" style="height: auto;">
+                                    <% availableProducts.filter(p => !['BEVERAGES', 'SIDES', 'COMBO'].includes(p.productCategory)).forEach(product => { %>
+                                        <option value="<%= product._id %>"><%= product.productName %></option>
+                                    <% }); %>
+                                </select>
+                                <p class="text-sm text-gray-500">Hold CTRL/CMD to select multiple items</p>
                             </div>
                         </div>
 
                         <!-- Product Images -->
-                        <div class="border-t pt-4">
-                            <label class="form-label">Product Images</label>
-                            <div class="image-upload-container">
-                                <!-- Image previews will be added here dynamically -->
-                                <button type="button" id="uploadImageBtn" class="image-upload-btn">
-                                    <i data-lucide="upload" class="text-gray-400 mb-1"></i>
-                                    <span class="text-xs text-gray-500">Upload</span>
-                                </button>
-                                <input type="file" id="imageUploadInput" accept="image/*" multiple class="hidden">
-                            </div>
-                            <p class="text-gray-500 text-sm mt-2">
-                                0/5 images uploaded (Max 5MB each)
-                            </p>
+                        <div class="form-group">
+                            <label class="form-label">Product Images (Max 5)</label>
+                            <input type="file" name="productImages" multiple accept="image/*" class="hidden" id="imageUploadInput">
+                            <button type="button" onclick="document.getElementById('imageUploadInput').click()" class="btn-secondary">
+                                Select Images
+                            </button>
+                            <div id="imagePreviews" class="flex gap-2 mt-2"></div>
                         </div>
 
                         <!-- Action Buttons -->
                         <div class="form-footer">
-                            <button type="button" id="cancelFormBtn" class="btn btn-secondary">
+                            <button type="button" onclick="closeModal()" class="btn btn-secondary">
                                 Cancel
                             </button>
                             <button type="submit" class="btn btn-primary">
@@ -389,180 +380,6 @@
             </div>
         </div>
     </div>
-        <!-- <div class="product-form-container p-6">
-        <button id="openFormBtn" class="btn btn-primary flex items-center gap-2">
-            <i data-lucide="plus" class="w-5 h-5"></i>
-            Add Product
-        </button>
-
-        <div id="productFormModal" class="modal-overlay hidden">
-            <div class="modal-content">
-                <div class="p-6">
-                    <div class="form-header">
-                        <h2 class="form-title">NEW PRODUCT DETAIL</h2>
-                        <button id="closeFormBtn" class="text-gray-500 hover:text-gray-700">
-                            <i data-lucide="x" class="w-6 h-6"></i>
-                        </button>
-                    </div>
-
-                    <form id="productForm" class="space-y-6">
-                        <div class="grid-cols-2 gap-4">
-                            <div class="form-group">
-                                <label class="form-label">Product Status</label>
-                                <select name="productStatus" class="form-input" required>
-                                    <option value="PROCESS" selected>PROCESS</option>
-                                    <option value="PAUSE">PAUSE</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Product Type</label>
-                                <div class="flex gap-2">
-                                    <button type="button" id="regularTypeBtn" class="flex-1 btn-primary">
-                                        Regular
-                                    </button>
-                                    <button type="button" id="comboTypeBtn" class="flex-1 btn-secondary">
-                                        Combo
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Product Name*</label>
-                            <input type="text" name="productName" class="form-input" placeholder="Enter product name" required>
-                        </div>
-
-                        <div class="grid-cols-2 gap-4">
-                            <div class="form-group">
-                                <label class="form-label">Price*</label>
-                                <div class="relative">
-                                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
-                                    <input type="number" name="productPrice" class="form-input pl-8" placeholder="0.00" min="0" required>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Category*</label>
-                                <select name="productCategory" class="form-input" required>
-                                    <option value="BURGERS" selected>BURGERS</option>
-                                    <option value="CHICKEN">CHICKEN</option>
-                                    <option value="MEXICAN">MEXICAN</option>
-                                    <option value="SIDES">SIDES</option>
-                                    <option value="BREAKFAST">BREAKFAST</option>
-                                    <option value="SALADS">SALADS</option>
-                                    <option value="DESSERTS">DESSERTS</option>
-                                    <option value="BEVERAGES">BEVERAGES</option>
-                                    <option value="SANDWICHES">SANDWICHES</option>
-                                    <option value="APPETIZERS">APPETIZERS</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="grid-cols-2 gap-4">
-                            <div class="form-group">
-                                <label class="form-label">Size</label>
-                                <select name="productSize" class="form-input">
-                                    <option value="SMALL">SMALL</option>
-                                    <option value="REGULAR" selected>REGULAR</option>
-                                    <option value="LARGE">LARGE</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Volume</label>
-                                <select name="productVolume" class="form-input">
-                                    <option value="0.5">0.5 litre</option>
-                                    <option value="1" selected >1 litre</option>
-                                    <option value="1.2">1.2 litre</option>
-                                    <option value="1.5">1.5 litre</option>
-                                    <option value="2">2 litre</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Available Times</label>
-                            <div class="time-selection">
-                                <button type="button" class="time-btn active">ALL_DAY</button>
-                                <button type="button" class="time-btn inactive">BREAKFAST</button>
-                                <button type="button" class="time-btn inactive">LUNCH</button>
-                                <button type="button" class="time-btn inactive">DINNER</button>
-                            </div>
-                        </div>
-
-                        <div class="grid-cols-2 gap-4">
-                            <div class="form-group">
-                                <label class="form-label">Spice Level</label>
-                                <select name="productSpice" class="form-input">
-                                    <option value="NONE">NONE</option>
-                                    <option value="MEDIUM" selected>MEDIUM</option>
-                                    <option value="HOT">HOT</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Prep Time (minutes)</label>
-                                <input type="number" name="preparationTime" value="15" class="form-input" min="1">
-                            </div>
-                        </div>
-
-                        <div class="grid-cols-2 gap-4">
-                            <div class="form-group">
-                                <label class="form-label">Calories</label>
-                                <input type="number" name="calories" class="form-input" placeholder="Enter calories" min="0">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Left Count</label>
-                                <input type="number" name="productLeftCount" value="999" class="form-input" min="0">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Tags</label>
-                            <input type="text" name="tags" class="form-input" placeholder="comma separated tags (e.g., spicy, vegetarian)">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Description</label>
-                            <textarea name="productDesc" class="form-input form-textarea" placeholder="Enter product description"></textarea>
-                        </div>
-
-                        <div id="comboSection" class="border-t pt-4 hidden">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-medium text-gray-800">Combo Details</h3>
-                                <button type="button" id="addComboBtn" class="btn btn-success flex items-center gap-2">
-                                    <i data-lucide="plus" class="w-4 h-4"></i>
-                                    Add Combo
-                                </button>
-                            </div>
-                            
-                            <div id="comboItemsContainer"></div>
-                        </div>
-
-                        <div class="border-t pt-4">
-                            <label class="form-label">Product Images</label>
-                            <div class="image-upload-container">
-                                <button type="button" id="uploadImageBtn" class="image-upload-btn">
-                                    <i data-lucide="upload" class="text-gray-400 mb-1"></i>
-                                    <span class="text-xs text-gray-500">Upload</span>
-                                </button>
-                                <input type="file" id="imageUploadInput" accept="image/*" multiple class="hidden">
-                            </div>
-                            <p class="text-gray-500 text-sm mt-2">
-                                0/5 images uploaded (Max 5MB each)
-                            </p>
-                        </div>
-
-                        <div class="form-footer">
-                            <button type="button" id="cancelFormBtn" class="btn btn-secondary">
-                                Cancel
-                            </button>
-                            <button type="submit" class="btn btn-primary">
-                                Create Product
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div> -->
   </main>
 
   <script src="https://unpkg.com/lucide@latest"></script>

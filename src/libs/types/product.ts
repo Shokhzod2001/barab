@@ -63,11 +63,14 @@ export interface ProductInput {
   productDesc?: string;
   productImages?: string[];
   preparationTime?: number;
-  isPopular?: boolean;
-  isNewItem?: boolean;
   tags?: string[];
-  combos?: Combo[];
   productViews?: number;
+  combos?: Combo[];
+  comboName?: string;
+  comboPrice?: string;
+  comboItems?: string[] | string; // Can be array or comma-separated string
+  comboDrink?: string;
+  comboSide?: string;
 }
 
 export interface ProductUpdateInput {

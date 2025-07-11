@@ -140,321 +140,118 @@ function showFilteredUsers(filteredUsers) {
 
 lucide.createIcons();
 
-// Initialize Lucide icons
-lucide.createIcons();
-
-// DOM elements
-const openFormBtn = document.getElementById("openFormBtn");
-const closeFormBtn = document.getElementById("closeFormBtn");
-const cancelFormBtn = document.getElementById("cancelFormBtn");
-const productFormModal = document.getElementById("productFormModal");
-const productForm = document.getElementById("productForm");
-const regularTypeBtn = document.getElementById("regularTypeBtn");
-const comboTypeBtn = document.getElementById("comboTypeBtn");
-const comboSection = document.getElementById("comboSection");
-const addComboBtn = document.getElementById("addComboBtn");
-const comboItemsContainer = document.getElementById("comboItemsContainer");
-const uploadImageBtn = document.getElementById("uploadImageBtn");
-const imageUploadInput = document.getElementById("imageUploadInput");
-const timeButtons = document.querySelectorAll(".time-btn");
-const productPriceInput = document.querySelector('input[name="productPrice"]');
-const comboPriceInput = document.getElementById("comboPriceInput");
-const comboPriceSummary = document.getElementById("comboPriceSummary");
-const comboItemsTotal = document.getElementById("comboItemsTotal");
-
-// Store available products for combos
-let availableProducts = [];
-let comboItems = [];
-
-// Open modal
-openFormBtn.addEventListener("click", () => {
-  productFormModal.classList.remove("hidden");
+// Modal toggle functions
+document.getElementById("openFormBtn").addEventListener("click", () => {
+  document.getElementById("productFormModal").classList.remove("hidden");
 });
 
-// Close modal
+document.getElementById("closeFormBtn").addEventListener("click", closeModal);
+
 function closeModal() {
-  productFormModal.classList.add("hidden");
+  document.getElementById("productFormModal").classList.add("hidden");
 }
 
-closeFormBtn.addEventListener("click", closeModal);
-cancelFormBtn.addEventListener("click", closeModal);
-
-// Toggle product type
+// Product type toggle with color change
 function setProductType(type) {
+  const regularBtn = document.getElementById("regularTypeBtn");
+  const comboBtn = document.getElementById("comboTypeBtn");
+  const categorySelect = document.querySelector('[name="productCategory"]');
+  const mainPriceInput = document.querySelector('[name="productPrice"]');
+  const comboPriceInput = document.querySelector('[name="comboPrice"]');
+
+  // Update button styles
   if (type === "regular") {
-    regularTypeBtn.classList.remove("btn-secondary");
-    regularTypeBtn.classList.add("btn-primary");
-    comboTypeBtn.classList.remove("btn-primary");
-    comboTypeBtn.classList.add("btn-secondary");
-    comboSection.classList.add("hidden");
+    regularBtn.classList.remove("btn-secondary");
+    regularBtn.classList.add("btn-primary");
+    comboBtn.classList.remove("btn-primary");
+    comboBtn.classList.add("btn-secondary");
 
-    // Reset combo items when switching to regular
-    comboItemsContainer.innerHTML = "";
-    comboItems = [];
+    // Reset category to default (BURGERS)
+    categorySelect.value = "BURGERS";
+
+    // Enable main price, disable combo price
+    mainPriceInput.disabled = false;
+    mainPriceInput.required = true;
+    comboPriceInput.disabled = true;
+    comboPriceInput.required = false;
   } else {
-    regularTypeBtn.classList.remove("btn-primary");
-    regularTypeBtn.classList.add("btn-secondary");
-    comboTypeBtn.classList.remove("btn-secondary");
-    comboTypeBtn.classList.add("btn-primary");
-    comboSection.classList.remove("hidden");
+    comboBtn.classList.remove("btn-secondary");
+    comboBtn.classList.add("btn-primary");
+    regularBtn.classList.remove("btn-primary");
+    regularBtn.classList.add("btn-secondary");
 
-    // Load products when switching to combo
-    fetchAvailableProducts();
+    // Set category to COMBO
+    categorySelect.value = "COMBO";
+
+    // Disable main price, enable combo price
+    mainPriceInput.disabled = true;
+    mainPriceInput.required = false;
+    comboPriceInput.disabled = false;
+    comboPriceInput.required = true;
+
+    // Auto-copy combo price to main price (for backend consistency)
+    comboPriceInput.addEventListener("input", () => {
+      mainPriceInput.value = comboPriceInput.value;
+    });
   }
+
+  // Update hidden field
+  document.getElementById("productType").value = type;
+
+  // Toggle combo section visibility
+  document
+    .getElementById("comboSection")
+    .classList.toggle("hidden", type !== "combo");
 }
 
-regularTypeBtn.addEventListener("click", () => setProductType("regular"));
-comboTypeBtn.addEventListener("click", () => setProductType("combo"));
-
-// Time selection
-timeButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    button.classList.toggle("active");
-    button.classList.toggle("inactive");
-  });
+// Initialize button states on page load
+document.addEventListener("DOMContentLoaded", function () {
+  setProductType("regular"); // Set default to regular
 });
 
-// Fetch available products for combo items
-async function fetchAvailableProducts() {
-  try {
-    // In a real app, replace this with your actual API call
-    // const response = await fetch('/api/products/available');
-    // availableProducts = await response.json();
-
-    // Mock data for demonstration
-    availableProducts = [
-      { _id: "prod1", productName: "Big Burger", productPrice: 12 },
-      { _id: "prod2", productName: "Cheese Burger", productPrice: 10 },
-      { _id: "prod3", productName: "Chicken Burger", productPrice: 11 },
-      { _id: "prod4", productName: "French Fries", productPrice: 5 },
-      { _id: "prod5", productName: "Soda", productPrice: 3 },
-    ];
-  } catch (error) {
-    console.error("Error fetching products:", error);
-    availableProducts = [];
-  }
+// Time selection toggle
+function toggleTime(button) {
+  button.classList.toggle("active");
+  button.classList.toggle("inactive");
+  const checkbox = button.nextElementSibling;
+  checkbox.checked = !checkbox.checked;
 }
 
-// Add product selection to combo
-async function addComboItem() {
-  if (availableProducts.length === 0) {
-    await fetchAvailableProducts();
-  }
-
-  const comboItemId = Date.now();
-  const comboItem = document.createElement("div");
-  comboItem.className = "combo-product-item";
-  comboItem.dataset.id = comboItemId;
-
-  // Create product options HTML
-  const productOptions = availableProducts
-    .map(
-      (product) =>
-        `<option value="${product._id}" data-price="${product.productPrice}">${product.productName} ($${product.productPrice})</option>`
-    )
-    .join("");
-
-  comboItem.innerHTML = `
-                <div class="combo-product-header">
-                    <h4 class="text-sm font-medium">Combo Product</h4>
-                    <button type="button" class="text-red-500 hover:text-red-700 remove-combo-item-btn">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    </button>
-                </div>
-                <div class="grid grid-cols-2 gap-4 mt-2">
-                    <div class="form-group">
-                        <label class="form-label">Product*</label>
-                        <select class="form-input combo-product-select" required>
-                            <option value="">Select a product</option>
-                            ${productOptions}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Quantity*</label>
-                        <input type="number" class="form-input combo-product-qty" value="1" min="1" required>
-                    </div>
-                </div>
-            `;
-
-  comboItemsContainer.appendChild(comboItem);
-
-  // Add event listeners
-  const removeBtn = comboItem.querySelector(".remove-combo-item-btn");
-  removeBtn.addEventListener("click", () => {
-    comboItem.remove();
-    comboItems = comboItems.filter((item) => item.id !== comboItemId);
-    updateComboSummary();
-  });
-
-  const productSelect = comboItem.querySelector(".combo-product-select");
-  const qtyInput = comboItem.querySelector(".combo-product-qty");
-
-  productSelect.addEventListener("change", () => {
-    const selectedOption = productSelect.options[productSelect.selectedIndex];
-    const productId = productSelect.value;
-    const price = parseFloat(selectedOption.dataset.price);
-    const quantity = parseInt(qtyInput.value) || 1;
-
-    // Update or add combo item
-    const existingItemIndex = comboItems.findIndex(
-      (item) => item.id === comboItemId
-    );
-    if (existingItemIndex >= 0) {
-      comboItems[existingItemIndex] = {
-        id: comboItemId,
-        productId,
-        price,
-        quantity,
-      };
-    } else {
-      comboItems.push({
-        id: comboItemId,
-        productId,
-        price,
-        quantity,
-      });
-    }
-
-    updateComboSummary();
-  });
-
-  qtyInput.addEventListener("change", () => {
-    const quantity = parseInt(qtyInput.value) || 1;
-    const existingItemIndex = comboItems.findIndex(
-      (item) => item.id === comboItemId
-    );
-
-    if (existingItemIndex >= 0 && productSelect.value) {
-      comboItems[existingItemIndex].quantity = quantity;
-      updateComboSummary();
-    }
-  });
-
-  // Refresh Lucide icons
-  lucide.createIcons();
-}
-
-// Update combo summary and total price
-function updateComboSummary() {
-  const total = comboItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-  comboItemsTotal.textContent = `$${total.toFixed(2)}`;
-  comboPriceInput.value = total.toFixed(2);
-  productPriceInput.value = total.toFixed(2);
-}
-
-// Image upload
-uploadImageBtn.addEventListener("click", () => {
-  imageUploadInput.click();
-});
-
-imageUploadInput.addEventListener("change", (e) => {
-  const files = Array.from(e.target.files);
-  if (files.length > 5) {
-    alert("Maximum 5 images allowed");
-    return;
-  }
-
-  files.forEach((file) => {
-    if (file.size > 5 * 1024 * 1024) {
-      alert(`File ${file.name} is too large (max 5MB)`);
+// Image upload handling
+document
+  .getElementById("imageUploadInput")
+  .addEventListener("change", function (e) {
+    if (this.files.length > 5) {
+      alert("Maximum 5 images allowed");
+      this.value = ""; // Clear selection
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const imagePreview = document.createElement("div");
-      imagePreview.className = "image-preview group";
-      imagePreview.innerHTML = `
-                        <img src="${event.target.result}" alt="Product preview">
-                        <button type="button" class="image-remove-btn">
-                            <i data-lucide="x" class="w-3 h-3"></i>
-                        </button>
-                    `;
-      uploadImageBtn.before(imagePreview);
+    // Show previews
+    const previews = document.getElementById("imagePreviews");
+    previews.innerHTML = "";
 
-      // Add event listener to remove button
-      const removeBtn = imagePreview.querySelector(".image-remove-btn");
-      removeBtn.addEventListener("click", () => {
-        imagePreview.remove();
-      });
-
-      // Refresh Lucide icons
-      lucide.createIcons();
-    };
-    reader.readAsDataURL(file);
+    Array.from(this.files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        const preview = document.createElement("div");
+        preview.className = "image-preview";
+        preview.innerHTML = `<img src="${event.target.result}" alt="Preview">`;
+        previews.appendChild(preview);
+      };
+      reader.readAsDataURL(file);
+    });
   });
-});
 
-// Form submission
-productForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  // Collect form data
-  const formData = new FormData(productForm);
-  const productData = {
-    productStatus: formData.get("productStatus"),
-    productCategory: formData.get("productCategory"),
-    productName: formData.get("productName"),
-    productPrice: parseFloat(formData.get("productPrice")),
-    productDesc: formData.get("productDesc"),
-    productSize: formData.get("productSize"),
-    productVolume: formData.get("productVolume"),
-    productSpice: formData.get("productSpice"),
-    preparationTime: parseInt(formData.get("preparationTime")) || 15,
-    calories: parseInt(formData.get("calories")) || 0,
-    productLeftCount: parseInt(formData.get("productLeftCount")) || 999,
-    tags: formData.get("tags")
-      ? formData
-          .get("tags")
-          .split(",")
-          .map((tag) => tag.trim())
-      : [],
-    isPopular: formData.get("isPopular") === "on",
-    isNewItem: formData.get("isNewItem") === "on",
-  };
-
-  // Handle available times
-  const selectedTimes = [];
-  document.querySelectorAll(".time-btn.active").forEach((btn) => {
-    selectedTimes.push(btn.textContent);
+// Category change handler for size/volume
+document
+  .querySelector('[name="productCategory"]')
+  .addEventListener("change", function () {
+    const isBeverage = this.value === "BEVERAGES";
+    document.getElementById("product-collection").style.display = isBeverage
+      ? "none"
+      : "block";
+    document.getElementById("product-volume").style.display = isBeverage
+      ? "block"
+      : "none";
   });
-  productData.productTime =
-    selectedTimes.length > 0 ? selectedTimes : ["ALL_DAY"];
-
-  // Handle combo if it's a combo product
-  if (comboTypeBtn.classList.contains("btn-primary")) {
-    productData.combos = [
-      {
-        comboName: formData.get("comboName"),
-        comboPrice: parseFloat(formData.get("comboPrice")),
-        comboDrink: formData.get("comboDrink"),
-        comboSide: formData.get("comboSide"),
-        comboItems: comboItems.map((item) => item.productId),
-      },
-    ];
-  }
-
-  // In a real app, you would send to your API
-  console.log("Product data to submit:", productData);
-
-  // Here you would typically:
-  // 1. Send to your backend API
-  // 2. Handle response
-  // 3. Update UI or redirect
-
-  // Demo success message
-  alert(`Product ${productData.productName} created successfully!`);
-  closeModal();
-
-  // Reset form
-  productForm.reset();
-  comboItemsContainer.innerHTML = "";
-  comboItems = [];
-  comboItemsTotal.textContent = "$0.00";
-});
-
-// Initialize combo functionality
-addComboBtn.addEventListener("click", addComboItem);

@@ -16,6 +16,7 @@ export enum ProductCategory {
   BEVERAGES = "BEVERAGES",
   SANDWICHES = "SANDWICHES",
   APPETIZERS = "APPETIZERS",
+  COMBO = "COMBO",
 }
 
 export enum ProductTime {

@@ -77,16 +77,6 @@ const productSchema = new Schema(
       default: 15,
     },
 
-    isPopular: {
-      type: Boolean,
-      default: false,
-    },
-
-    isNewItem: {
-      type: Boolean,
-      default: false,
-    },
-
     productViews: {
       type: Number,
       default: 0,
@@ -114,9 +104,10 @@ const productSchema = new Schema(
       {
         comboName: { type: String, required: true },
         comboPrice: { type: Number, required: true, min: 0 },
-        comboItems: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
-        comboDrink: { type: String },
-        comboSide: { type: String },
+        comboItems: [{ type: Schema.Types.ObjectId, ref: "Product" }],
+        comboDrink: { type: Schema.Types.ObjectId, ref: "Product" },
+        comboSide: { type: Schema.Types.ObjectId, ref: "Product" },
+        createdAt: { type: Date, default: Date.now },
       },
     ],
   },
