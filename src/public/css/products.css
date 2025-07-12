@@ -667,63 +667,36 @@ h1 {
 }
 
 /* Image upload styles */
-.image-upload-container {
+.preview-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 0.5rem;
+  gap: 10px;
+  margin-top: 10px;
 }
-
-.image-preview {
+.preview-item {
   position: relative;
-  width: 6rem;
-  height: 6rem;
+  width: 80px;
+  height: 80px;
 }
-
-.image-preview img {
+.preview-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 0.375rem;
-  border: 1px solid #e5e7eb;
+  border-radius: 4px;
 }
-
-.image-remove-btn {
+.remove-btn {
   position: absolute;
-  top: -0.5rem;
-  right: -0.5rem;
-  width: 1.5rem;
-  height: 1.5rem;
-  background-color: #ef4444;
+  top: -5px;
+  right: -5px;
+  width: 20px;
+  height: 20px;
+  background: red;
   color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.image-preview:hover .image-remove-btn {
-  opacity: 1;
-}
-
-.image-upload-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 6rem;
-  height: 6rem;
-  border: 2px dashed #d1d5db;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.image-upload-btn:hover {
-  background-color: #f9fafb;
 }
 
 /* Combo item styles */

@@ -14,6 +14,7 @@ interface Combo {
   comboItems?: string[]; // Array of menu item IDs
   comboDrink?: string;
   comboSide?: string;
+  createdAt?: Date;
 }
 
 export interface Product {
@@ -31,8 +32,6 @@ export interface Product {
   productDesc?: string;
   productImages: string[];
   preparationTime: number;
-  isPopular: boolean;
-  isNewItem: boolean;
   productViews: number;
   productOrders: number;
   tags: string[];
@@ -88,8 +87,6 @@ export interface ProductUpdateInput {
   productDesc?: string;
   productImages?: string[];
   preparationTime?: number;
-  isPopular?: boolean;
-  isNewItem?: boolean;
   tags?: string[];
   combos?: Combo[];
   productViews?: number;

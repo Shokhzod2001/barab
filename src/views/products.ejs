@@ -358,14 +358,13 @@
 
                         <!-- Product Images -->
                         <div class="form-group">
-                            <label class="form-label">Product Images (Max 5)</label>
-                            <input type="file" name="productImages" multiple accept="image/*" class="hidden" id="imageUploadInput">
-                            <button type="button" onclick="document.getElementById('imageUploadInput').click()" class="btn-secondary">
-                                Select Images
-                            </button>
-                            <div id="imagePreviews" class="flex gap-2 mt-2"></div>
+                          <label>Product Images (Max 5)</label>
+                          <input type="file" name="productImages" multiple accept="image/*" class="hidden" id="imageUpload">
+                          <button type="button" onclick="document.getElementById('imageUpload').click()" class="btn">
+                            Select Images
+                          </button>
+                          <div id="imagePreviews" class="preview-container"></div>
                         </div>
-
                         <!-- Action Buttons -->
                         <div class="form-footer">
                             <button type="button" onclick="closeModal()" class="btn btn-secondary">

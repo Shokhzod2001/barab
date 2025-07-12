@@ -85,7 +85,9 @@ productController.createNewProduct = async (
     }
 
     const data: ProductInput = req.body;
-    data.productImages = req.files.map((file) => file.path.replace(/\\/g, "/"));
+    data.productImages = req.files?.map((ele) => {
+      return ele.path.replace(/\\/g, "/");
+    });
 
     // Handle combo products
     if (data.productCategory === "COMBO") {

@@ -125,7 +125,7 @@ function showFilteredUsers(filteredUsers) {
       noResultsRow.id = "noResultsRow";
       noResultsRow.innerHTML = `
         <td colspan="4" style="text-align: center; padding: 2rem; color: #666;">
-          No users found matching your criteria
+          No products found matching your criteria
         </td>
       `;
       tableBody.appendChild(noResultsRow);
@@ -218,30 +218,72 @@ function toggleTime(button) {
 }
 
 // Image upload handling
-document
-  .getElementById("imageUploadInput")
-  .addEventListener("change", function (e) {
-    if (this.files.length > 5) {
-      alert("Maximum 5 images allowed");
-      this.value = ""; // Clear selection
-      return;
-    }
+const imageUpload = document.getElementById("imageUpload");
+const form = document.querySelector("form"); // Your product form
 
-    // Show previews
-    const previews = document.getElementById("imagePreviews");
-    previews.innerHTML = "";
+// Store files and maintain submission
+let selectedFiles = [];
 
-    Array.from(this.files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = function (event) {
-        const preview = document.createElement("div");
-        preview.className = "image-preview";
-        preview.innerHTML = `<img src="${event.target.result}" alt="Preview">`;
-        previews.appendChild(preview);
-      };
-      reader.readAsDataURL(file);
-    });
+imageUpload.addEventListener("change", function () {
+  const newFiles = Array.from(this.files);
+
+  // Combine with existing, limit to 5
+  selectedFiles = [...selectedFiles, ...newFiles].slice(0, 5);
+
+  if (selectedFiles.length > 5) {
+    alert("Maximum 5 images allowed");
+    selectedFiles = selectedFiles.slice(0, 5);
+  }
+
+  updatePreviews();
+  updateFileInput();
+  this.value = ""; // Reset input
+});
+
+function updatePreviews() {
+  const previews = document.getElementById("imagePreviews");
+  previews.innerHTML = "";
+
+  selectedFiles.forEach((file, index) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const div = document.createElement("div");
+      div.className = "preview-item";
+      div.innerHTML = `
+        <img src="${e.target.result}">
+        <span class="remove-btn" data-index="${index}">×</span>
+      `;
+      previews.appendChild(div);
+
+      // Add removal handler
+      div.querySelector(".remove-btn").addEventListener("click", (e) => {
+        e.preventDefault();
+        selectedFiles.splice(index, 1);
+        updatePreviews();
+        updateFileInput();
+      });
+    };
+    reader.readAsDataURL(file);
   });
+}
+
+// Critical: Update the actual file input before submission
+function updateFileInput() {
+  const dataTransfer = new DataTransfer();
+  selectedFiles.forEach((file) => dataTransfer.items.add(file));
+  imageUpload.files = dataTransfer.files;
+}
+
+// Ensure files are included in form submission
+form.addEventListener("submit", function (e) {
+  updateFileInput(); // Final sync before submit
+
+  if (selectedFiles.length === 0) {
+    e.preventDefault();
+    alert("Please select at least one image");
+    return false;
+  }
+});
 
 // Category change handler for size/volume
 document
