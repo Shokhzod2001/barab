@@ -1,0 +1,145 @@
+<%- include('includes/header') %>
+
+<link rel="stylesheet" type="text/css" href="/css/products.css" />
+
+<body>
+  <!-- Animated Background Elements -->
+  <div class="background-elements">
+    <div class="bg-element bg-element-1"></div>
+    <div class="bg-element bg-element-2"></div>
+    <div class="bg-element bg-element-3"></div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <div class="logo-icon">B</div>
+        <div class="logo-text">
+          <h1>Barab Restaurant</h1>
+          <p>Admin Dashboard</p>
+        </div>
+      </div>
+      <a href="/admin/logout">
+        <button
+          class="logout-btn"
+          onclick="return confirm('Do you really want to logout?')"
+        >
+          <i data-lucide="log-out"></i>
+          Logout
+        </button>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Navigation Tabs -->
+    <div class="tabs-container">
+      <a href="/admin/user/all">
+        <button class="tab-btn active">
+          <i data-lucide="users"></i>
+          <span>Users</span>
+          <div class="pulse-dot"></div>
+        </button>
+      </a>
+      <a href="/admin/chef/all">
+        <button class="tab-btn active">
+          <i data-lucide="chef-hat"></i>
+          <span>Chefs</span>
+          <div class="pulse-dot"></div>
+        </button>
+      </a>
+      <a href="/admin/product/all">
+        <button class="tab-btn active">
+          <i data-lucide="menu"></i>
+          <span>Menu</span>
+          <div class="pulse-dot"></div>
+        </button>
+      </a>
+      <a href="/admin/reserve/all">
+        <button class="tab-btn active">
+          <i data-lucide="calendar-check"></i>
+          <span>Reserves</span>
+          <div class="pulse-dot"></div>
+        </button>
+      </a>
+    </div>
+
+    <!-- Content -->
+    <div class="users-container">
+      <div class="users-header">
+        <h2>
+          <i data-lucide="hamburger" style="color: #3b26d9"></i>
+          Barab Reservation
+        </h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Table</th>
+              <th>Persons</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <% reservations.forEach((reserve, index) => { %>
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-info">
+                    <div class="user-name"><%= reserve.name %></div>
+                    <div class="user-id">ID: #<%= reserve.id %></div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="contact-cell">
+                  <div class="contact-item phone"><%= reserve.phone %></div>
+                </div>
+              </td>
+              <td>
+                <div class="date-cell">
+                  <div class="contact-item" style="font-weight: 600">
+                    <%= reserve.date %>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="date-cell">
+                  <div class="contact-item" style="font-weight: 600">
+                    <%= reserve.time %>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="date-cell">
+                  <div class="contact-item" style="font-weight: 600">
+                    <%= reserve.table %>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="date-cell">
+                  <div class="contact-item" style="font-weight: 600">
+                    <%= reserve.persons %>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script type="text/javascript" src="/js/products.js"></script>
+</body>
+
+<%- include('includes/footer') %>

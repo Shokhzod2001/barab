@@ -64,13 +64,12 @@ routerAdmin.post(
   restaurantController.createNewChef
 );
 
-// Reservation
-routerAdmin.post("/reserve/create", restaurantController.createNewReserve);
-routerAdmin.get("/reserve/all", restaurantController.getReserves);
+// Reservation routes
 routerAdmin.get(
-  "/reserve/availability",
-  restaurantController.getAvailableTables
+  "/reserve/all",
+  restaurantController.verifyRestaurant,
+  restaurantController.getReserves
 );
-routerAdmin.get("/reserve/:id/cancel", restaurantController.cancelReservation);
+routerAdmin.post("/reserve/create", restaurantController.createNewReserve);
 
 export default routerAdmin;
