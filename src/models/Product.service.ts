@@ -24,29 +24,34 @@ class ProductService {
 
   //SPA
   public async getProducts(inquiry: ProductInquiry): Promise<Product[]> {
-    const match: T = { productStatus: ProductStatus.PROCESS };
-    if (inquiry.productCategory)
-      match.productCollection = inquiry.productCategory;
+    const match: any = { productStatus: ProductStatus.PROCESS };
+
+    if (inquiry.productCategory) {
+      const categories = Array.isArray(inquiry.productCategory)
+        ? inquiry.productCategory
+        : [inquiry.productCategory];
+      match.productCategory = { $in: categories };
+    }
 
     if (inquiry.search) {
       match.productName = { $regex: new RegExp(inquiry.search, "i") };
     }
 
-    const sort: T =
+    const sort: any =
       inquiry.order === "productPrice"
         ? { [inquiry.order]: 1 }
         : { [inquiry.order]: -1 };
 
     const result = await this.productModel
       .aggregate([
-        { $match: match }, //finding
+        { $match: match },
         { $sort: sort },
-        { $skip: (inquiry.page * 1 - 1) * inquiry.limit },
-        { $limit: inquiry.limit * 1 },
+        { $skip: (inquiry.page - 1) * inquiry.limit },
+        { $limit: inquiry.limit },
       ])
       .exec();
-    if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
 
+    if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
     return result;
   }
 

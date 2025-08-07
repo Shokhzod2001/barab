@@ -44,7 +44,7 @@ export interface ProductInquiry {
   order: string;
   page: number;
   limit: number;
-  productCategory?: ProductCategory;
+  productCategory?: ProductCategory | ProductCategory[];
   search?: string;
 }
 

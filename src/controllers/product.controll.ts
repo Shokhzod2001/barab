@@ -14,21 +14,22 @@ const productController: T = {};
 //SPA
 productController.getProducts = async (req: Request, res: Response) => {
   try {
-    console.log("getProducts");
-    const { page, limit, order, productCollection, search } = req.query;
+    const { page, limit, order, productCategory, search } = req.query;
     const inquiry: ProductInquiry = {
       order: String(order),
       page: Number(page),
       limit: Number(limit),
     };
 
-    if (productCollection) {
-      inquiry.productCategory = productCollection as ProductCategory;
+    if (productCategory) {
+      inquiry.productCategory =
+        typeof productCategory === "string" && productCategory.includes(",")
+          ? (productCategory.split(",") as ProductCategory[])
+          : (productCategory as ProductCategory);
     }
     if (search) inquiry.search = String(search);
 
     const result = await productService.getProducts(inquiry);
-
     res.status(HttpCode.OK).json(result);
   } catch (err) {
     console.log("Error, getProducts", err);

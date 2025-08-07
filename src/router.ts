@@ -27,7 +27,7 @@ router.post(
   memberController.updateMember
 );
 
-router.get("/member/top-users", memberController.getTopUsers);
+router.get("/member/topChefs", memberController.getTopChefs);
 
 // Product
 router.get("/product/all", productController.getProducts);
