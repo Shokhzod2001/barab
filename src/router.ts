@@ -28,6 +28,7 @@ router.post(
 );
 
 router.get("/member/topChefs", memberController.getTopChefs);
+router.get("/member/chefs", memberController.getAllChefs);
 
 // Product
 router.get("/product/all", productController.getProducts);
