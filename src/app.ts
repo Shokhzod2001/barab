@@ -7,6 +7,8 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import passport from "passport";
 import session from "express-session";
+import { Server as SocketIOServer } from "socket.io";
+import http from "http";
 
 import { MORGAN_FORMAT } from "./libs/config";
 import AuthService from "./models/Auth.service";
@@ -113,10 +115,26 @@ app.use("/auth", authRoutes);
 app.use("/admin", adminMiddleware);
 
 // Apply additional role-based middleware for specific admin routes
-app.use("/admin/secure", requireAdmin); // requires ADMIN / RESTAURANT / CHEF
+app.use("/admin/secure", requireAdmin);
 
 // Router setup
 app.use("/admin", routerAdmin);
 app.use("/", router); // Public SPA
 
-export default app;
+const server = http.createServer(app);
+const io = new SocketIOServer(server, {
+  cors: { origin: true, credentials: true },
+});
+
+let summaryClient = 0;
+io.on("connection", (socket) => {
+  summaryClient++;
+  console.log(`Connection & total [${summaryClient}]`);
+
+  socket.on("disconnect", () => {
+    summaryClient--;
+    console.log(`Disconnect & total [${summaryClient}]`);
+  });
+});
+
+export default server;
