@@ -32,6 +32,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({ credentials: true, origin: true }));
 app.use(cookieParser());
 app.use(morgan(MORGAN_FORMAT));
+app.locals.baseUrl = process.env.BASE_URL || "http://localhost:3009";
 
 /** Session + Passport (OAuth) **/
 app.use(
